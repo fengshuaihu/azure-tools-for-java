@@ -23,6 +23,7 @@ import com.microsoft.azuretools.azurecommons.helpers.Nullable;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
+import java.util.WeakHashMap;
 
 public class JobViewEditor implements FileEditor {
 
@@ -36,6 +37,7 @@ public class JobViewEditor implements FileEditor {
     private final String uuid;
 
     private static Logger LOG = Logger.getInstance(JobViewEditor.class.getName());
+    private WeakHashMap<Key,Object> userDatas = new WeakHashMap<Key,Object>();
 
     public JobViewEditor(@NotNull final Project project, @NotNull final VirtualFile file, final JobViewEditorProvider provider) {
         LOG.info("start open JobView page");
@@ -136,12 +138,17 @@ public class JobViewEditor implements FileEditor {
     @Nullable
     @Override
     public <T> T getUserData(@NotNull Key<T> key) {
+        if (userDatas.containsKey(key)) {
+            WeakHashMap<Key<T>,Object> userData = new WeakHashMap<Key<T>,Object>();
+            userData.put(key,userDatas.get(key));
+            return (T) userData;
+        }
         return null;
     }
 
     @Override
     public <T> void putUserData(@NotNull Key<T> key, @Nullable T t) {
-
+        this.userDatas.put(key, t);
     }
 
     @Override
