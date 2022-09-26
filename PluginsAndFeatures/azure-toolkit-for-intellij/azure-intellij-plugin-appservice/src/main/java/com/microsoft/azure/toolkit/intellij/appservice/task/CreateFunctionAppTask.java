@@ -5,7 +5,7 @@ import com.microsoft.azure.toolkit.ide.guidance.ComponentContext;
 import com.microsoft.azure.toolkit.ide.guidance.Task;
 import com.microsoft.azure.toolkit.ide.guidance.task.SignInTask;
 import com.microsoft.azure.toolkit.lib.Azure;
-import com.microsoft.azure.toolkit.lib.appservice.function.FunctionApp;
+import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppBase;
 import com.microsoft.azure.toolkit.lib.appservice.model.Runtime;
 import com.microsoft.azure.toolkit.lib.auth.AzureAccount;
 import com.microsoft.azure.toolkit.lib.common.exception.AzureToolkitRuntimeException;
@@ -44,10 +44,10 @@ public class CreateFunctionAppTask implements Task {
         functionAppConfig.setName(name);
         functionAppConfig.setSubscription(subscription);
         functionAppConfig.setRuntime(Runtime.FUNCTION_WINDOWS_JAVA11);
-        final FunctionApp functionApp = FunctionAppService.getInstance().createFunctionApp(functionAppConfig);
-        context.applyResult(FUNCTION_ID, functionApp.getId());
-        context.applyResult(RESOURCE_GROUP, functionApp.getResourceGroupName());
-        context.applyResult(INSIGHTS_INSTRUMENT_KEY, functionApp.getAppSettings().get(APPINSIGHTS_INSTRUMENTATION_KEY));
+        final FunctionAppBase<?, ?, ?> app =  FunctionAppService.getInstance().createOrUpdateFunctionApp(functionAppConfig);
+        context.applyResult(FUNCTION_ID, app.getId());
+        context.applyResult(RESOURCE_GROUP, app.getResourceGroupName());
+        context.applyResult(INSIGHTS_INSTRUMENT_KEY, app.getAppSettings().get(APPINSIGHTS_INSTRUMENTATION_KEY));
     }
 
     @Nonnull

@@ -5,8 +5,10 @@
 
 package com.microsoft.azure.toolkit.ide.appservice.function;
 
+import com.microsoft.azure.toolkit.ide.appservice.AppServiceDeploymentSlotsNodeView;
 import com.microsoft.azure.toolkit.ide.appservice.file.AppServiceFileNode;
 import com.microsoft.azure.toolkit.ide.appservice.function.node.FunctionsNode;
+import com.microsoft.azure.toolkit.ide.appservice.webapp.WebAppActionsContributor;
 import com.microsoft.azure.toolkit.ide.appservice.webapp.WebAppNodeProvider;
 import com.microsoft.azure.toolkit.ide.common.IExplorerNodeProvider;
 import com.microsoft.azure.toolkit.ide.common.action.ResourceCommonActionsContributor;
@@ -21,6 +23,8 @@ import com.microsoft.azure.toolkit.lib.Azure;
 import com.microsoft.azure.toolkit.lib.appservice.AppServiceAppBase;
 import com.microsoft.azure.toolkit.lib.appservice.function.AzureFunctions;
 import com.microsoft.azure.toolkit.lib.appservice.function.FunctionApp;
+import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppDeploymentSlot;
+import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppDeploymentSlotModule;
 import com.microsoft.azure.toolkit.lib.appservice.model.AppServiceFile;
 
 import javax.annotation.Nonnull;
@@ -65,12 +69,25 @@ public class FunctionAppNodeProvider implements IExplorerNodeProvider {
                 .inlineAction(ResourceCommonActionsContributor.PIN)
                 .actions(FunctionAppActionsContributor.FUNCTION_APP_ACTIONS)
                 .addChildren(Arrays::asList, (app, webAppNode) -> new FunctionsNode(app))
+                .addChild(FunctionApp::getDeploymentModule, (module, webAppNode) -> createDeploymentSlotNode(module, manager))
                 .addChild(AppServiceFileNode::getRootFileNodeForAppService, (d, p) -> this.createNode(d, p, manager)) // Files
                 .addChild(AppServiceFileNode::getRootLogNodeForAppService, (d, p) -> this.createNode(d, p, manager));
+        } else if (data instanceof FunctionAppDeploymentSlot) {
+            final FunctionAppDeploymentSlot slot = (FunctionAppDeploymentSlot) data;
+            return new Node<>(slot)
+                    .view(new AzureResourceLabelView<>(slot))
+                    .actions(FunctionAppActionsContributor.DEPLOYMENT_SLOT_ACTIONS);
         } else if (data instanceof AppServiceFile) {
             final AppServiceFile file = (AppServiceFile) data;
             return new AppServiceFileNode(file);
         }
         return null;
+    }
+
+    private Node<?> createDeploymentSlotNode(@Nonnull FunctionAppDeploymentSlotModule module, @Nonnull Manager manager) {
+        return new Node<>(module)
+                .view(new AppServiceDeploymentSlotsNodeView(module.getParent()))
+                .actions(FunctionAppActionsContributor.DEPLOYMENT_SLOTS_ACTIONS)
+                .addChildren(FunctionAppDeploymentSlotModule::list, (d, p) -> this.createNode(d, p, manager));
     }
 }

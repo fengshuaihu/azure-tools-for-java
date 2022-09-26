@@ -19,7 +19,6 @@ import com.microsoft.azure.toolkit.lib.resource.task.CreateResourceGroupTask;
 import com.microsoft.azure.toolkit.lib.sqlserver.AzureSqlServer;
 import com.microsoft.azure.toolkit.lib.sqlserver.MicrosoftSqlServer;
 import com.microsoft.azure.toolkit.lib.sqlserver.MicrosoftSqlServerDraft;
-import com.microsoft.azure.toolkit.lib.storage.StorageAccount;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

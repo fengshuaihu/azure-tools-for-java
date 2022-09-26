@@ -124,6 +124,7 @@ public class ConnectorDialog extends AzureDialog<Connection<?, ?>> implements Az
                     resource.getName(), consumer.getName());
                 AzureMessager.getMessager().success(message);
                 project.getMessageBus().syncPublisher(ConnectionTopics.CONNECTION_CHANGED).connectionChanged(project, connection, ConnectionTopics.Action.ADD);
+
             }
         });
     }

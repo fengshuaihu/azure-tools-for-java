@@ -6,6 +6,7 @@ package com.microsoft.azure.toolkit.intellij.database.connection;
 
 import com.azure.resourcemanager.resources.fluentcore.arm.ResourceId;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.ui.AnimatedIcon;
 import com.microsoft.azure.toolkit.intellij.common.AzureComboBox;
 import com.microsoft.azure.toolkit.intellij.common.AzureFormJPanel;
@@ -27,13 +28,13 @@ import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
 import com.microsoft.azure.toolkit.lib.database.JdbcUrl;
 import com.microsoft.azure.toolkit.lib.database.entity.IDatabase;
 import com.microsoft.azure.toolkit.lib.database.entity.IDatabaseServer;
-import com.microsoft.azuretools.azurecommons.util.Utils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -183,7 +184,7 @@ public abstract class SqlDatabaseResourcePanel<T extends IDatabase> implements A
 
     private void onCopyButtonClicked(ActionEvent e) {
         try {
-            Utils.copyToSystemClipboard(testResultTextPane.getText());
+            CopyPasteManager.getInstance().setContents(new StringSelection(testResultTextPane.getText()));
         } catch (final Exception exception) {
             final String error = "copy test result error";
             final String action = "try again later.";

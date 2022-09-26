@@ -61,13 +61,6 @@ public class ResourceConnectionExplorer extends Tree {
     private static class ModuleNode extends Node<Module> {
         public ModuleNode(@Nonnull Module module) {
             super(module);
-            final MessageBusConnection connection = module.getProject().getMessageBus().connect();
-            connection.subscribe(CONNECTION_CHANGED, (p, conn, action) -> {
-                final Resource<?> consumer = conn.getConsumer();
-                if ((consumer instanceof ModuleResource) && ((ModuleResource) consumer).getModuleName().equals(module.getName())) {
-                    this.view().refreshChildren(true);
-                }
-            });
         }
     }
 
@@ -76,6 +69,9 @@ public class ResourceConnectionExplorer extends Tree {
             super(project);
             final MessageBusConnection connection = project.getMessageBus().connect();
             connection.subscribe(CONNECTIONS_REFRESHED, () -> this.view().refreshChildren());
+            connection.subscribe(CONNECTION_CHANGED, (p, conn, action) -> {
+                this.view().refreshChildren(true);
+            });
         }
     }
 

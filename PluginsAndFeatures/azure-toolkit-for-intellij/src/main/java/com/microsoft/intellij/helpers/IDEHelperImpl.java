@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.actions.RevealFileAction;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -58,7 +57,6 @@ import com.microsoft.azuretools.azurecommons.helpers.AzureCmdException;
 import com.microsoft.azuretools.azurecommons.helpers.NotNull;
 import com.microsoft.azuretools.azurecommons.helpers.Nullable;
 import com.microsoft.intellij.ApplicationSettings;
-import com.microsoft.intellij.AzureSettings;
 import com.microsoft.intellij.util.PluginUtil;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
 import com.microsoft.tooling.msservices.helpers.IDEHelper;
@@ -153,64 +151,6 @@ public class IDEHelperImpl implements IDEHelper {
     @Override
     public void executeOnPooledThread(@NotNull Runnable runnable) {
         ApplicationManager.getApplication().executeOnPooledThread(runnable);
-    }
-
-    @Nullable
-    @Override
-    public String getProperty(@NotNull String name) {
-        return AzureSettings.getSafeInstance(PluginUtil.getSelectedProject()).getProperty(name);
-    }
-
-    public String getProperty(@NotNull String name, Object projectObject) {
-        return AzureSettings.getSafeInstance((Project) projectObject).getProperty(name);
-    }
-
-    @NotNull
-    @Override
-    public String getPropertyWithDefault(@NotNull String name, @NotNull String defaultValue) {
-        return PropertiesComponent.getInstance().getValue(name, defaultValue);
-    }
-
-    @Override
-    public void setProperty(@NotNull String name, @NotNull String value) {
-        AzureSettings.getSafeInstance(PluginUtil.getSelectedProject()).setProperty(name, value);
-    }
-
-    @Override
-    public void setProperty(@NotNull String name, @NotNull String value, Object projectObject) {
-        AzureSettings.getSafeInstance((Project) projectObject).setProperty(name, value);
-    }
-
-    @Override
-    public void unsetProperty(@NotNull String name) {
-        AzureSettings.getSafeInstance(PluginUtil.getSelectedProject()).unsetProperty(name);
-    }
-
-    @Override
-    public void unsetProperty(@NotNull String name, Object projectObject) {
-        AzureSettings.getSafeInstance((Project) projectObject).unsetProperty(name);
-    }
-
-    @Override
-    public boolean isPropertySet(@NotNull String name) {
-        return AzureSettings.getSafeInstance(PluginUtil.getSelectedProject()).isPropertySet(name);
-    }
-
-    @Nullable
-    @Override
-    public String[] getProperties(@NotNull String name) {
-        return AzureSettings.getSafeInstance(PluginUtil.getSelectedProject()).getProperties(name);
-    }
-
-    @Nullable
-    @Override
-    public String[] getProperties(@NotNull String name, Object projectObject) {
-        return AzureSettings.getSafeInstance((Project) projectObject).getProperties(name);
-    }
-
-    @Override
-    public void setProperties(@NotNull String name, @NotNull String[] value) {
-        AzureSettings.getSafeInstance(PluginUtil.getSelectedProject()).setProperties(name, value);
     }
 
     @NotNull

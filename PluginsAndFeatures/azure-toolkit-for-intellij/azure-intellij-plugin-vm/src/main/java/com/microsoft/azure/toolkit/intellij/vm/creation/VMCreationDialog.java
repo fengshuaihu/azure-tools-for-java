@@ -75,12 +75,18 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.regex.Pattern;
 
 public class VMCreationDialog extends AzureDialog<VirtualMachineDraft> implements AzureForm<VirtualMachineDraft> {
     public static final String SSH_PUBLIC_KEY_DESCRIPTION = "<html> Provide an RSA public key file in the single-line format (starting with \"ssh-rsa\") or " +
         "the multi-line PEM format. <p/> You can generate SSH keys using ssh-keygen on Linux and OS X, or PuTTYGen on Windows. </html>";
     public static final String SELECT_CERT_TITLE = "Select SSH public key";
     private static final String VIRTUAL_MACHINE_CREATION_DIALOG_TITLE = "Create Virtual Machine";
+    private static final Pattern VM_USER_NAME_PATTERN  = Pattern.compile("^[A-Za-z-][A-Za-z0-9-_]*$");
+    private static final String[] INVALID_USERNAMES = new String[]{"administrator", "admin", "user", "user1", "test", "user2", "test1", "user3", "admin1", "1", "123", "a", "actuser", "adm", "admin2", "aspnet", "backup", "console", "david", "guest", "john", "owner", "root", "server", "sql", "support", "support_388945a0", "sys", "test2", "test3", "user4", "user5"};
+    private static final String INVALID_LENGTH_MESSAGE = "Invalid user name. The name must be between 1 and %d characters long.";
+    private static final String INVALID_ALPHANUMERIC_MESSAGE = "Invalid user name. The name may not start with a hyphen or number, contain only letters, numbers, hyphens, and underscores.";
+    private static final String INVALID_USERNAMES_MESSAGE = "Invalid user name. The name must not include reserved words";
     private JTabbedPane tabbedPane;
     private JPanel rootPane;
     private JPanel basicPane;
@@ -351,6 +357,7 @@ public class VMCreationDialog extends AzureDialog<VirtualMachineDraft> implement
         this.cbStorageAccount = new AzureStorageAccountComboBox();
         this.txtUserName = new AzureTextInput();
         this.txtUserName.setRequired(true);
+        this.txtUserName.addValidator(this::validateUserName);
 
         this.txtVisualMachineName = new AzureTextInput();
         this.txtVisualMachineName.setRequired(true);
@@ -547,6 +554,27 @@ public class VMCreationDialog extends AzureDialog<VirtualMachineDraft> implement
             return AzureValidationInfo.error(AzureMessageBundle.message("vm.name.validate.exist", name).toString(), txtVisualMachineName);
         }
         return AzureValidationInfo.success(txtVisualMachineName);
+    }
+
+    private AzureValidationInfo validateUserName() {
+        final String name = txtUserName.getText();
+        // validate length
+        int nameMaxLen = 64;
+        if (cbImage.getSelectedItem() instanceof VmImage) {
+            nameMaxLen = ((VmImage) cbImage.getSelectedItem()).getOperatingSystem() == OperatingSystem.Windows ? 20 : 64;
+        }
+        if (StringUtils.isEmpty(name) || name.length() > nameMaxLen) {
+            return AzureValidationInfo.error(String.format(INVALID_LENGTH_MESSAGE, nameMaxLen), txtUserName);
+        }
+        // validate special character
+        if (!VM_USER_NAME_PATTERN.matcher(name).matches()) {
+            return AzureValidationInfo.error(INVALID_ALPHANUMERIC_MESSAGE, txtUserName);
+        }
+        // validate reserved words
+        if (StringUtils.equalsAnyIgnoreCase(name, INVALID_USERNAMES)) {
+            return AzureValidationInfo.error(INVALID_USERNAMES_MESSAGE, txtUserName);
+        }
+        return AzureValidationInfo.success(txtUserName);
     }
 
     private AzureValidationInfo validateMaximumPricing() {

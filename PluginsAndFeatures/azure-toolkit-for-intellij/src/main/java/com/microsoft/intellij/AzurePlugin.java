@@ -100,15 +100,12 @@ public class AzurePlugin implements StartupActivity.DumbAware {
 
     public static List<DeploymentEventListener> depEveList = new ArrayList<DeploymentEventListener>();
 
-    private AzureSettings azureSettings;
-
     private String installationID;
 
     private Boolean firstInstallationByVersion;
 
     @Override
     public void runActivity(@NotNull Project project) {
-        this.azureSettings = AzureSettings.getSafeInstance(project);
         initializeAIRegistry(project);
         // Showing dialog needs to be run in UI thread
         initializeWhatsNew(project);
@@ -174,7 +171,6 @@ public class AzurePlugin implements StartupActivity.DumbAware {
 
     private void initializeAIRegistry(Project myProject) {
         try {
-            AzureSettings.getSafeInstance(myProject).loadAppInsights();
             Module[] modules = ModuleManager.getInstance(myProject).getModules();
             for (Module module : modules) {
                 if (module != null && module.isLoaded() && ModuleTypeId.JAVA_MODULE.equals(module.getOptionValue(Module.ELEMENT_TYPE))) {
@@ -196,7 +192,6 @@ public class AzurePlugin implements StartupActivity.DumbAware {
                     }
                 }
             }
-            AzureSettings.getSafeInstance(myProject).saveAppInsights();
         } catch (Exception ex) {
             // https://intellij-support.jetbrains.com/hc/en-us/community/posts/115000093184-What-is-com-intellij-openapi-progress-ProcessCanceledException
             // should ignore ProcessCanceledException
@@ -233,15 +228,6 @@ public class AzurePlugin implements StartupActivity.DumbAware {
                         for (Module module : modules) {
                             if (ModuleTypeId.JAVA_MODULE.equals(module.getOptionValue(Module.ELEMENT_TYPE))) {
                                 javaModules.add(module.getName());
-                            }
-                        }
-                        Set<String> keys = AzureSettings.getSafeInstance(myProject).getPropertyKeys();
-                        for (String key : keys) {
-                            if (key.endsWith(".webapps")) {
-                                String projName = key.substring(0, key.lastIndexOf("."));
-                                if (!javaModules.contains(projName)) {
-                                    AzureSettings.getSafeInstance(myProject).unsetProperty(key);
-                                }
                             }
                         }
                     }

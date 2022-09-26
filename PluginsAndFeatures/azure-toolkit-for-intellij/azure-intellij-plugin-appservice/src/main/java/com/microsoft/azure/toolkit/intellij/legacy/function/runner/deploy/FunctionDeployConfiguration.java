@@ -168,7 +168,13 @@ public class FunctionDeployConfiguration extends AzureRunConfigurationBase<Funct
     @Override
     public void readExternal(Element element) throws InvalidDataException {
         this.functionDeployModel = Optional.ofNullable(element.getChild("FunctionDeployModel"))
-                .map(e -> XmlSerializer.deserialize(e, FunctionDeployModel.class))
+                .map(e -> {
+                    try {
+                        return XmlSerializer.deserialize(e, FunctionDeployModel.class);
+                    } catch (final Throwable t) {
+                        return null;
+                    }
+                })
                 .orElseGet(FunctionDeployModel::new);
         Optional.ofNullable(this.getAppSettingsKey())
                 .ifPresent(key -> functionDeployModel.getFunctionAppConfig().setAppSettings(FunctionUtils.loadAppSettingsFromSecurityStorage(getAppSettingsKey())));
@@ -179,5 +185,10 @@ public class FunctionDeployConfiguration extends AzureRunConfigurationBase<Funct
         Optional.ofNullable(this.functionDeployModel)
                 .map(config -> XmlSerializer.serialize(config, (accessor, o) -> !"appSettings".equalsIgnoreCase(accessor.getName())))
                 .ifPresent(element::addContent);
+    }
+
+    public void setAppSettings(Map<String, String> appSettings) {
+        functionDeployModel.getFunctionAppConfig().setAppSettings(appSettings);
+        FunctionUtils.saveAppSettingsToSecurityStorage(getAppSettingsKey(), appSettings);
     }
 }

@@ -44,8 +44,6 @@ public interface UIHelper {
 
     File showFileSaver(String title, String fileName);
 
-    String promptForOpenSSLPath();
-
     void openRedisPropertyView(@NotNull RedisCacheNode node);
 
     void openRedisExplorer(@NotNull RedisCacheNode node);

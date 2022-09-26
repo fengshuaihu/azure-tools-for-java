@@ -75,33 +75,6 @@ public interface IDEHelper {
                                  Runnable runnable) {
     }
 
-    @Nullable
-    String getProperty(@NotNull String name);
-
-    @NotNull
-    String getProperty(@NotNull String name, Object projectObject);
-
-    @NotNull
-    String getPropertyWithDefault(@NotNull String name, @NotNull String defaultValue);
-
-    void setProperty(@NotNull String name, @NotNull String value);
-
-    void setProperty(@NotNull String name, @NotNull String value, Object projectObject);
-
-    void unsetProperty(@NotNull String name);
-
-    boolean isPropertySet(@NotNull String name);
-
-    void unsetProperty(@NotNull String name, Object projectObject);
-
-    @Nullable
-    String[] getProperties(@NotNull String name);
-
-    @Nullable
-    String[] getProperties(@NotNull String name, Object projectObject);
-
-    void setProperties(@NotNull String name, @NotNull String[] value);
-
     @NotNull
     List<ArtifactDescriptor> getArtifacts(@NotNull ProjectDescriptor projectDescriptor)
             throws AzureCmdException;

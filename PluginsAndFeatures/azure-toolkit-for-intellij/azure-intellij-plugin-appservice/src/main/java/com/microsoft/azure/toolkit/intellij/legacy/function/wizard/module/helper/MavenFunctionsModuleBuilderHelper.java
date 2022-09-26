@@ -44,7 +44,6 @@ public class MavenFunctionsModuleBuilderHelper {
         RefreshQueue.getInstance().refresh(true, true, () -> {
             final String packageName = wizardContext.getUserData(AzureFunctionsConstants.WIZARD_PACKAGE_NAME_KEY);
             final MavenProject parentProject = MavenUtils.getMavenProjectByDirectory(project, parentPath);
-            final MavenProject rootProject = MavenUtils.getRootMavenProject(project, parentProject);
             final MavenId mavenId = new MavenId(groupId, artifactId, version);
             final VirtualFile pomFile = Optional.ofNullable(vf).map(file -> file.findChild(MavenConstants.POM_XML)).orElse(null);
             if (pomFile == null) {

@@ -129,6 +129,7 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
         appSettingDecorator.setContentComponent(pnlAppSettings);
         appSettingDecorator.setOn(true);
 
+        btnGetPublishFile.setIcon(AllIcons.Actions.Download);
         btnGetPublishFile.addActionListener(new AzureActionListenerWrapper(INSIGHT_NAME, "btnGetPublishFile", null) {
             @Override
             public void actionPerformedFunc(ActionEvent event) {

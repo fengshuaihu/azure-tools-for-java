@@ -32,6 +32,7 @@ import com.microsoft.azure.toolkit.lib.appservice.AppServiceAppBase;
 import com.microsoft.azure.toolkit.lib.appservice.entity.FunctionEntity;
 import com.microsoft.azure.toolkit.lib.appservice.function.AzureFunctions;
 import com.microsoft.azure.toolkit.lib.appservice.function.FunctionApp;
+import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppDeploymentSlot;
 import com.microsoft.azure.toolkit.lib.appservice.model.AppServiceFile;
 import com.microsoft.azure.toolkit.lib.appservice.model.Runtime;
 import com.microsoft.azure.toolkit.lib.appservice.webapp.AzureWebApp;
@@ -128,6 +129,10 @@ public class AppServiceIntelliJActionsContributor implements IActionsContributor
         final BiConsumer<AzResourceBase, AnActionEvent> showFunctionPropertyViewHandler = (c, e) -> AzureTaskManager.getInstance()
             .runLater(() -> new OpenAppServicePropertyViewAction().openFunctionAppPropertyView((FunctionApp) c, e.getProject()));
         am.registerHandler(ResourceCommonActionsContributor.SHOW_PROPERTIES, (r, e) -> r instanceof FunctionApp, showFunctionPropertyViewHandler);
+
+        final BiConsumer<AzResourceBase, AnActionEvent> showFunctionSlotPropertyViewHandler = (c, e) -> AzureTaskManager.getInstance()
+                .runLater(() -> new OpenAppServicePropertyViewAction().openFunctionAppDeploymentSlotPropertyView((FunctionAppDeploymentSlot) c, e.getProject()));
+        am.registerHandler(ResourceCommonActionsContributor.SHOW_PROPERTIES, (r, e) -> r instanceof FunctionAppDeploymentSlot, showFunctionSlotPropertyViewHandler);
 
         final BiConsumer<AzResourceBase, AnActionEvent> showWebAppPropertyViewHandler = (c, e) -> AzureTaskManager.getInstance()
             .runLater(() -> new OpenAppServicePropertyViewAction().openWebAppPropertyView((WebApp) c, e.getProject()));

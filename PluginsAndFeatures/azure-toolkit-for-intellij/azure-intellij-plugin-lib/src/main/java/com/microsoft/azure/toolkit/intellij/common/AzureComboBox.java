@@ -94,7 +94,6 @@ public class AzureComboBox<T> extends ComboBox<T> implements AzureFormInputCompo
         this.myEditor = new AzureComboBoxEditor();
         this.setEditable(true);
         this.setEditor(this.myEditor);
-        this.setMinimumAndPreferredWidth(this.getPreferredSize().width);
         this.setLoading(false);
         this.setRenderer(new SimpleListCellRenderer<>() {
             @Override

@@ -12,7 +12,10 @@ import com.microsoft.azure.toolkit.ide.common.action.ResourceCommonActionsContri
 import com.microsoft.azure.toolkit.ide.common.icon.AzureIcons;
 import com.microsoft.azure.toolkit.lib.appservice.entity.FunctionEntity;
 import com.microsoft.azure.toolkit.lib.appservice.function.FunctionApp;
+import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppDeploymentSlot;
 import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppDeploymentSlotModule;
+import com.microsoft.azure.toolkit.lib.appservice.webapp.WebApp;
+import com.microsoft.azure.toolkit.lib.appservice.webapp.WebAppDeploymentSlot;
 import com.microsoft.azure.toolkit.lib.common.action.Action;
 import com.microsoft.azure.toolkit.lib.common.action.ActionGroup;
 import com.microsoft.azure.toolkit.lib.common.action.ActionView;
@@ -24,6 +27,7 @@ import com.microsoft.azure.toolkit.lib.resource.ResourceGroup;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static com.microsoft.azure.toolkit.ide.appservice.AppServiceActionsContributor.REFRESH_DEPLOYMENT_SLOTS;
 import static com.microsoft.azure.toolkit.ide.common.action.ResourceCommonActionsContributor.OPEN_AZURE_SETTINGS;
 import static com.microsoft.azure.toolkit.ide.common.action.ResourceCommonActionsContributor.OPEN_URL;
 import static com.microsoft.azure.toolkit.lib.common.operation.OperationBundle.description;
@@ -35,7 +39,10 @@ public class FunctionAppActionsContributor implements IActionsContributor {
     public static final String FUNCTION_APP_ACTIONS = "actions.function.function_app";
     public static final String FUNCTIONS_ACTIONS = "actions.function.functions";
     public static final String FUNCTION_ACTION = "actions.function.function";
+    public static final String DEPLOYMENT_SLOTS_ACTIONS = "actions.function.deployment_slots";
+    public static final String DEPLOYMENT_SLOT_ACTIONS = "actions.function.deployment_slot";
 
+    public static final Action.Id<FunctionAppDeploymentSlot> SWAP_DEPLOYMENT_SLOT = Action.Id.of("function.swap_deployment_slot");
     public static final Action.Id<FunctionApp> REFRESH_FUNCTIONS = Action.Id.of("function.refresh_functions");
     public static final Action.Id<FunctionEntity> TRIGGER_FUNCTION = Action.Id.of("function.trigger_function");
     public static final Action.Id<FunctionEntity> TRIGGER_FUNCTION_IN_BROWSER = Action.Id.of("function.trigger_in_browser");
@@ -77,6 +84,26 @@ public class FunctionAppActionsContributor implements IActionsContributor {
         );
         am.registerGroup(FUNCTION_APP_ACTIONS, functionAppActionGroup);
 
+        final ActionGroup slotActionGroup = new ActionGroup(
+                ResourceCommonActionsContributor.REFRESH,
+                ResourceCommonActionsContributor.OPEN_PORTAL_URL,
+                AppServiceActionsContributor.OPEN_IN_BROWSER,
+                ResourceCommonActionsContributor.SHOW_PROPERTIES,
+                "---",
+                SWAP_DEPLOYMENT_SLOT,
+                "---",
+                ResourceCommonActionsContributor.START,
+                ResourceCommonActionsContributor.STOP,
+                ResourceCommonActionsContributor.RESTART,
+                ResourceCommonActionsContributor.DELETE,
+                "---",
+                AppServiceActionsContributor.START_STREAM_LOG,
+                AppServiceActionsContributor.STOP_STREAM_LOG
+        );
+        am.registerGroup(DEPLOYMENT_SLOT_ACTIONS, slotActionGroup);
+
+        am.registerGroup(DEPLOYMENT_SLOTS_ACTIONS, new ActionGroup(REFRESH_DEPLOYMENT_SLOTS));
+
         am.registerGroup(FUNCTION_ACTION, new ActionGroup(FunctionAppActionsContributor.TRIGGER_FUNCTION,
                 FunctionAppActionsContributor.TRIGGER_FUNCTION_IN_BROWSER, FunctionAppActionsContributor.TRIGGER_FUNCTION_WITH_HTTP_CLIENT));
         am.registerGroup(FUNCTIONS_ACTIONS, new ActionGroup(FunctionAppActionsContributor.REFRESH_FUNCTIONS));
@@ -87,6 +114,13 @@ public class FunctionAppActionsContributor implements IActionsContributor {
 
     @Override
     public void registerActions(AzureActionManager am) {
+        final Consumer<FunctionAppDeploymentSlot> swap = slot -> slot.getParent().swap(slot.getName());
+        final ActionView.Builder swapView = new ActionView.Builder("Swap With Production")
+                .title(s -> Optional.ofNullable(s).map(r -> description("function.swap_deployment.deployment|app",
+                        ((FunctionAppDeploymentSlot) s).getName(), ((FunctionAppDeploymentSlot) s).getParent().getName())).orElse(null))
+                .enabled(s -> s instanceof FunctionAppDeploymentSlot && ((FunctionAppDeploymentSlot) s).getFormalStatus().isRunning());
+        am.registerAction(SWAP_DEPLOYMENT_SLOT, new Action<>(SWAP_DEPLOYMENT_SLOT, swap, swapView));
+
         final Consumer<FunctionApp> refresh = functionApp -> AzureEventBus.emit("appservice|function.functions.refresh", functionApp);
         final ActionView.Builder refreshView = new ActionView.Builder("Refresh", AzureIcons.Action.REFRESH.getIconPath())
                 .title(s -> Optional.ofNullable(s).map(r -> description("function.refresh_funcs")).orElse(null))

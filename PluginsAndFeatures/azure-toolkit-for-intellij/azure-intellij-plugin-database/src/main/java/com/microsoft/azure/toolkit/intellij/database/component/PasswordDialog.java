@@ -6,6 +6,7 @@
 package com.microsoft.azure.toolkit.intellij.database.component;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnimatedIcon;
 import com.microsoft.azure.toolkit.intellij.common.AzureDialog;
@@ -19,13 +20,13 @@ import com.microsoft.azure.toolkit.lib.common.form.AzureFormInput;
 import com.microsoft.azure.toolkit.lib.common.messager.AzureMessageBundle;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTask;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
-import com.microsoft.azuretools.azurecommons.util.Utils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -121,7 +122,7 @@ public class PasswordDialog extends AzureDialog<Password> implements AzureForm<P
 
     private void onCopyButtonClicked(ActionEvent e) {
         try {
-            Utils.copyToSystemClipboard(testResultTextPane.getText());
+            CopyPasteManager.getInstance().setContents(new StringSelection(testResultTextPane.getText()));
         } catch (final Exception exception) {
             final String error = "copy test result error";
             final String action = "try again later.";

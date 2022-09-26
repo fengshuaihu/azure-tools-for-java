@@ -4,7 +4,6 @@
  */
 package com.microsoft.azure.toolkit.intellij.database;
 
-import com.microsoft.azure.CloudException;
 import com.microsoft.azure.toolkit.lib.common.form.AzureFormInput;
 import com.microsoft.azure.toolkit.lib.common.form.AzureValidationInfo;
 import com.microsoft.azure.toolkit.lib.common.model.Availability;
@@ -44,7 +43,7 @@ public class BaseNameValidator implements AzureFormInput.Validator {
                 }
                 return AzureValidationInfo.error(message, input);
             }
-        } catch (final CloudException e) {
+        } catch (final Exception e) {
             return AzureValidationInfo.error(e.getMessage(), input);
         }
         return AzureValidationInfo.success(input);

@@ -210,9 +210,9 @@ public class Tree extends SimpleTree implements DataProvider {
                 this.remove(0);
             }
             this.refreshChildrenView();
-            Optional.ofNullable(toSelect)
-                .filter(s -> ((DefaultMutableTreeNode) s.getPathComponent(1)).getUserObject() instanceof AzureResources) //  is node in app-centric view.
-                .ifPresent(p -> TreeUtil.selectPath(this.tree, p, false));
+//            Optional.ofNullable(toSelect)
+//                .filter(s -> ((DefaultMutableTreeNode) s.getPathComponent(1)).getUserObject() instanceof AzureResources) //  is node in app-centric view.
+//                .ifPresent(p -> TreeUtil.selectPath(this.tree, p, false));
             this.loaded = true;
         }
 

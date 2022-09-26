@@ -100,6 +100,7 @@ public class MavenUtils {
         return null;
     }
 
+    @Nullable
     public static MavenProject getRootMavenProject(final Project project, final MavenProject mavenProject) {
         if (mavenProject == null) {
             return null;
@@ -108,11 +109,15 @@ public class MavenUtils {
         MavenId parentId = mavenProject.getParentId();
         while (parentId != null) {
             result = getMavenProjectById(project, parentId);
+            if (result == null) {
+                return null;
+            }
             parentId = result.getParentId();
         }
         return result;
     }
 
+    @Nullable
     public static MavenProject getMavenProjectById(final Project project, final MavenId mavenId) {
         return MavenProjectsManager.getInstance(project).getProjects().stream()
                 .filter(pro -> Objects.equals(pro.getMavenId(), mavenId)).findFirst().orElse(null);

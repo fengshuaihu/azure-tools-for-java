@@ -12,10 +12,12 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.microsoft.azure.toolkit.ide.common.icon.AzureIcons;
 import com.microsoft.azure.toolkit.intellij.common.AzureFileType;
 import com.microsoft.azure.toolkit.intellij.common.IntelliJAzureIcons;
+import com.microsoft.azure.toolkit.intellij.legacy.function.FunctionAppDeploymentSlotPropertyViewProvider;
 import com.microsoft.azure.toolkit.intellij.legacy.function.FunctionAppPropertyViewProvider;
 import com.microsoft.azure.toolkit.intellij.legacy.webapp.DeploymentSlotPropertyViewProvider;
 import com.microsoft.azure.toolkit.intellij.legacy.webapp.WebAppPropertyViewProvider;
 import com.microsoft.azure.toolkit.lib.appservice.function.FunctionApp;
+import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppDeploymentSlot;
 import com.microsoft.azure.toolkit.lib.appservice.webapp.WebApp;
 import com.microsoft.azure.toolkit.lib.appservice.webapp.WebAppDeploymentSlot;
 import com.microsoft.azure.toolkit.lib.common.messager.AzureMessager;
@@ -91,6 +93,26 @@ public class OpenAppServicePropertyViewAction {
         if (itemVirtualFile == null) {
             itemVirtualFile = createVirtualFile(functionApp.name(), subscriptionId, functionApId);
             itemVirtualFile.setFileType(new AzureFileType(type, IntelliJAzureIcons.getIcon(AzureIcons.FunctionApp.MODULE)));
+        }
+        final LightVirtualFile finalItemVirtualFile = itemVirtualFile;
+        AzureTaskManager.getInstance().runLater(() -> fileEditorManager.openFile(finalItemVirtualFile, true /*focusEditor*/, true /*searchForOpen*/));
+    }
+
+    public void openFunctionAppDeploymentSlotPropertyView(@NotNull FunctionAppDeploymentSlot slot, @Nullable Project project) {
+        final String sid = slot.getSubscriptionId();
+        final String resourceId = slot.getId();
+        final FileEditorManager fileEditorManager = getFileEditorManager(sid, resourceId, project);
+        if (fileEditorManager == null) {
+            return;
+        }
+        final String type = FunctionAppDeploymentSlotPropertyViewProvider.TYPE;
+        LightVirtualFile itemVirtualFile = searchExistingFile(fileEditorManager, type, resourceId);
+        if (itemVirtualFile == null) {
+            final Map<Key, String> userData = new HashMap<>();
+            userData.put(SUBSCRIPTION_ID, sid);
+            userData.put(RESOURCE_ID, resourceId);
+            itemVirtualFile = createVirtualFile(slot.getParent().getName() + "-" + slot.getName(), userData);
+            itemVirtualFile.setFileType(new AzureFileType(type, IntelliJAzureIcons.getIcon(AzureIcons.DeploymentSlot.MODULE)));
         }
         final LightVirtualFile finalItemVirtualFile = itemVirtualFile;
         AzureTaskManager.getInstance().runLater(() -> fileEditorManager.openFile(finalItemVirtualFile, true /*focusEditor*/, true /*searchForOpen*/));

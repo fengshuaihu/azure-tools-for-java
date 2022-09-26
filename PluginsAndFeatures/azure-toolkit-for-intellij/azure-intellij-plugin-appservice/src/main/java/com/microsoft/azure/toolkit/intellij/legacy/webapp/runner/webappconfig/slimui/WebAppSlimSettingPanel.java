@@ -18,7 +18,6 @@ import com.microsoft.azure.toolkit.intellij.common.AzureArtifact;
 import com.microsoft.azure.toolkit.intellij.common.AzureArtifactManager;
 import com.microsoft.azure.toolkit.intellij.common.AzureArtifactType;
 import com.microsoft.azure.toolkit.intellij.legacy.common.AzureSettingPanel;
-import com.microsoft.azure.toolkit.intellij.legacy.function.runner.core.FunctionUtils;
 import com.microsoft.azure.toolkit.intellij.legacy.webapp.runner.Constants;
 import com.microsoft.azure.toolkit.intellij.legacy.webapp.runner.webappconfig.IntelliJWebAppSettingModel;
 import com.microsoft.azure.toolkit.intellij.legacy.webapp.runner.webappconfig.WebAppConfiguration;
@@ -40,7 +39,6 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 public class WebAppSlimSettingPanel extends AzureSettingPanel<WebAppConfiguration> {
     private JPanel pnlRoot;
@@ -160,7 +158,6 @@ public class WebAppSlimSettingPanel extends AzureSettingPanel<WebAppConfiguratio
             configuration.setCreatingNew(StringUtils.isEmpty(webAppConfig.getResourceId()));
             if (configuration.isCreatingNew()) {
                 configuration.setRegion(webAppConfig.getRegion().getName());
-                configuration.setCreatingResGrp(webAppConfig.getResourceGroup().toResource().isDraftForCreating());
                 configuration.setCreatingAppServicePlan(webAppConfig.getServicePlan().toResource().isDraftForCreating());
                 configuration.setPricing(Optional.ofNullable(webAppConfig.getServicePlan())
                     .map(AppServicePlanConfig::getPricingTier).map(PricingTier::getSize).orElse(null));
@@ -176,7 +173,6 @@ public class WebAppSlimSettingPanel extends AzureSettingPanel<WebAppConfiguratio
                     configuration.getModel().setEnableFailedRequestTracing(diagnosticConfig.isEnableFailedRequestTracing());
                 });
             } else {
-                configuration.setCreatingResGrp(false);
                 configuration.setCreatingAppServicePlan(false);
                 configuration.setAppServicePlanName(Optional.ofNullable(webAppConfig.getServicePlan())
                         .map(AppServicePlanConfig::getName).orElse(null));

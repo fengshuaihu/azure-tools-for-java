@@ -64,7 +64,6 @@ public class WebAppService {
         settings.setSubscriptionId(config.getSubscription().getId());
         // creating if id is empty
         final ResourceGroup rg = config.getResourceGroup().toResource();
-        settings.setCreatingResGrp(rg.isDraftForCreating() || StringUtils.isEmpty(rg.getId()));
         settings.setResourceGroup(rg.getName());
         settings.setWebAppName(config.getName());
         settings.setRegion(config.getRegion().getName());

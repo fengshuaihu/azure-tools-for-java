@@ -17,7 +17,6 @@ import com.microsoft.azure.toolkit.lib.database.DatabaseServerConfig;
 import com.microsoft.azure.toolkit.lib.mysql.AzureMySql;
 import com.microsoft.azure.toolkit.lib.mysql.MySqlServer;
 import com.microsoft.azure.toolkit.lib.mysql.MySqlServerDraft;
-import com.microsoft.azure.toolkit.lib.postgre.PostgreSqlServer;
 import com.microsoft.azure.toolkit.lib.resource.ResourceGroup;
 import com.microsoft.azure.toolkit.lib.resource.task.CreateResourceGroupTask;
 

@@ -8,19 +8,19 @@ package com.microsoft.azure.toolkit.intellij.legacy.appservice;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.TitledSeparator;
 import com.microsoft.azure.toolkit.ide.appservice.model.AppServiceConfig;
-import com.microsoft.azure.toolkit.intellij.legacy.appservice.platform.RuntimeComboBox;
 import com.microsoft.azure.toolkit.intellij.common.AzureArtifact;
 import com.microsoft.azure.toolkit.intellij.common.AzureArtifactComboBox;
 import com.microsoft.azure.toolkit.intellij.common.AzureArtifactManager;
 import com.microsoft.azure.toolkit.intellij.common.AzureFormPanel;
+import com.microsoft.azure.toolkit.intellij.legacy.appservice.platform.RuntimeComboBox;
 import com.microsoft.azure.toolkit.lib.appservice.model.Runtime;
-import com.microsoft.azure.toolkit.lib.auth.AzureAccount;
 import com.microsoft.azure.toolkit.lib.common.form.AzureFormInput;
 import com.microsoft.azure.toolkit.lib.common.model.Subscription;
 import lombok.SneakyThrows;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static com.microsoft.azure.toolkit.lib.Azure.az;
 import static com.microsoft.azuretools.utils.WebAppUtils.isSupportedArtifactType;
 
 public class AppServiceInfoBasicPanel<T extends AppServiceConfig> extends JPanel implements AzureFormPanel<T> {
@@ -50,18 +49,15 @@ public class AppServiceInfoBasicPanel<T extends AppServiceConfig> extends JPanel
     private JLabel lblName;
     private JLabel lblPlatform;
 
-    private Subscription subscription;
-
-    public AppServiceInfoBasicPanel(final Project project, final Supplier<? extends T> defaultConfigSupplier) {
+    public AppServiceInfoBasicPanel(final Project project, @Nonnull final Subscription subscription, final Supplier<? extends T> defaultConfigSupplier) {
         super();
         this.project = project;
         this.supplier = defaultConfigSupplier;
         $$$setupUI$$$(); // tell IntelliJ to call createUIComponents() here.
-        this.init();
+        this.init(subscription);
     }
 
-    private void init() {
-        this.subscription = az(AzureAccount.class).account().getSelectedSubscriptions().get(0);
+    private void init(Subscription subscription) {
         this.textName.setRequired(true);
         this.textName.setSubscription(subscription);
         this.selectorRuntime.setRequired(true);
@@ -104,6 +100,7 @@ public class AppServiceInfoBasicPanel<T extends AppServiceConfig> extends JPanel
     public void setValue(final T config) {
         this.config = config;
         this.textName.setValue(config.getName());
+        this.textName.setSubscription(config.getSubscription());
         this.selectorRuntime.setValue(config.getRuntime());
     }
 

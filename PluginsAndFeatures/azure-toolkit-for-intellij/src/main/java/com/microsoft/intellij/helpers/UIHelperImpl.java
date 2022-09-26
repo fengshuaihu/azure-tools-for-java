@@ -29,7 +29,6 @@ import com.microsoft.azuretools.azurecommons.helpers.Nullable;
 import com.microsoft.azuretools.azurecommons.util.Utils;
 import com.microsoft.intellij.AzurePlugin;
 import com.microsoft.intellij.forms.ErrorMessageForm;
-import com.microsoft.intellij.forms.OpenSSLFinderForm;
 import com.microsoft.intellij.ui.util.UIUtils;
 import com.microsoft.intellij.util.PluginUtil;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
@@ -151,16 +150,6 @@ public class UIHelperImpl implements UIHelper {
             return save.getFile();
         }
         return null;
-    }
-
-    @NotNull
-    @Override
-    public String promptForOpenSSLPath() {
-        final OpenSSLFinderForm openSSLFinderForm = new OpenSSLFinderForm(null);
-        openSSLFinderForm.setModal(true);
-        openSSLFinderForm.show();
-
-        return DefaultLoader.getIdeHelper().getPropertyWithDefault("MSOpenSSLPath", "");
     }
 
     @Override

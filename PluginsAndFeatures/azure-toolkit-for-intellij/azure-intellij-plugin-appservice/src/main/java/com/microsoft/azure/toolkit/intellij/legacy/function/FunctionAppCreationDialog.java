@@ -12,13 +12,19 @@ import com.microsoft.azure.toolkit.intellij.common.AzureFormPanel;
 import com.microsoft.azure.toolkit.intellij.common.ConfigDialog;
 import com.microsoft.azure.toolkit.intellij.legacy.appservice.AppServiceInfoBasicPanel;
 import com.microsoft.azure.toolkit.lib.appservice.model.Runtime;
+import com.microsoft.azure.toolkit.lib.auth.AzureAccount;
+import com.microsoft.azure.toolkit.lib.auth.IAccountActions;
+import com.microsoft.azure.toolkit.lib.common.exception.AzureToolkitRuntimeException;
+import com.microsoft.azure.toolkit.lib.common.model.Subscription;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
+import java.util.List;
 import java.util.Optional;
 
 import static com.microsoft.azure.toolkit.intellij.common.AzureBundle.message;
+import static com.microsoft.azure.toolkit.lib.Azure.az;
 
 public class FunctionAppCreationDialog extends ConfigDialog<FunctionAppConfig> {
 
@@ -55,7 +61,12 @@ public class FunctionAppCreationDialog extends ConfigDialog<FunctionAppConfig> {
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
-        basicPanel = new AppServiceInfoBasicPanel<>(project, () -> FunctionAppConfig.getFunctionAppDefaultConfig(project.getName())) {
+        final List<Subscription> selectedSubscriptions = az(AzureAccount.class).account().getSelectedSubscriptions();
+        if (selectedSubscriptions.isEmpty()) {
+            this.close();
+            throw new AzureToolkitRuntimeException("there are no subscriptions selected in your account.", IAccountActions.SELECT_SUBS);
+        }
+        basicPanel = new AppServiceInfoBasicPanel<>(project, selectedSubscriptions.get(0), () -> FunctionAppConfig.getFunctionAppDefaultConfig(project.getName())) {
             @Override
             public FunctionAppConfig getValue() {
                 // Create AI instance with same name by default

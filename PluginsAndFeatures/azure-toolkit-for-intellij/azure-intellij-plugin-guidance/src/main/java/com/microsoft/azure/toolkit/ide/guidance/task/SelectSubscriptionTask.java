@@ -5,13 +5,14 @@ import com.microsoft.azure.toolkit.ide.guidance.Task;
 import com.microsoft.azure.toolkit.lib.Azure;
 import com.microsoft.azure.toolkit.lib.auth.Account;
 import com.microsoft.azure.toolkit.lib.auth.AzureAccount;
+import com.microsoft.azure.toolkit.lib.auth.IAccountActions;
 import com.microsoft.azure.toolkit.lib.common.bundle.AzureString;
 import com.microsoft.azure.toolkit.lib.common.event.AzureEventBus;
+import com.microsoft.azure.toolkit.lib.common.exception.AzureToolkitRuntimeException;
 import com.microsoft.azure.toolkit.lib.common.messager.AzureMessager;
 import com.microsoft.azure.toolkit.lib.common.model.Subscription;
 import com.microsoft.azure.toolkit.lib.common.operation.AzureOperation;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
-import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -48,7 +49,9 @@ public class SelectSubscriptionTask implements Task {
     private void selectSubscription() {
         final Account account = Azure.az(AzureAccount.class).account();
         final List<Subscription> subscriptions = account.getSubscriptions();
-        assert CollectionUtils.isNotEmpty(subscriptions) : "there are no subscriptions in your account";
+        if (subscriptions.isEmpty()) {
+            throw new AzureToolkitRuntimeException("there are no subscriptions in your account", IAccountActions.TRY_AZURE, IAccountActions.SELECT_SUBS);
+        }
         List<Subscription> selectedSubscriptions = account.getSelectedSubscriptions();
         if (selectedSubscriptions.isEmpty()) {
             account.setSelectedSubscriptions(List.of(subscriptions.get(0).getId()));

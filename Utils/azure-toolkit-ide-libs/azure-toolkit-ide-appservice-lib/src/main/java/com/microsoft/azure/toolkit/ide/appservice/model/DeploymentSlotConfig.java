@@ -15,10 +15,11 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SuperBuilder(toBuilder = true)
 public class DeploymentSlotConfig {
     private boolean newCreate;
+    @EqualsAndHashCode.Include
     private String name;
     private String configurationSource;
 }

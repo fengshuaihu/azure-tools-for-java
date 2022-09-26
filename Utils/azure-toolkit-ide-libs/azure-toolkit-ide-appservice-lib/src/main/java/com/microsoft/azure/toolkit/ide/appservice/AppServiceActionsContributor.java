@@ -12,6 +12,7 @@ import com.microsoft.azure.toolkit.lib.appservice.AppServiceAppBase;
 import com.microsoft.azure.toolkit.lib.common.action.Action;
 import com.microsoft.azure.toolkit.lib.common.action.ActionView;
 import com.microsoft.azure.toolkit.lib.common.action.AzureActionManager;
+import com.microsoft.azure.toolkit.lib.common.event.AzureEventBus;
 import com.microsoft.azure.toolkit.lib.common.model.AzResource;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,6 +31,7 @@ public class AppServiceActionsContributor implements IActionsContributor {
     public static final Action.Id<AppServiceAppBase<?, ?, ?>> STOP_STREAM_LOG = Action.Id.of("appservice.stop_stream_log");
     public static final Action.Id<AppServiceAppBase<?, ?, ?>> SSH_INTO_WEBAPP = Action.Id.of("webapp.ssh");
     public static final Action.Id<AppServiceAppBase<?, ?, ?>> PROFILE_FLIGHT_RECORD = Action.Id.of("webapp.flight_record");
+    public static final Action.Id<AppServiceAppBase<?, ?, ?>> REFRESH_DEPLOYMENT_SLOTS = Action.Id.of("appservice.refresh_deployment_slots");
 
     @Override
     public void registerActions(AzureActionManager am) {
@@ -37,7 +39,7 @@ public class AppServiceActionsContributor implements IActionsContributor {
             .handle("https://" + appService.getHostName());
         final ActionView.Builder openInBrowserView = new ActionView.Builder("Open In Browser",  AzureIcons.Action.PORTAL.getIconPath())
             .title(s -> Optional.ofNullable(s).map(r -> description("webapp.open_browser")).orElse(null))
-            .enabled(s -> s instanceof AppServiceAppBase);
+            .enabled(s -> s instanceof AppServiceAppBase && ((AppServiceAppBase<?, ?, ?>) s).getFormalStatus().isConnected());
         am.registerAction(OPEN_IN_BROWSER, new Action<>(OPEN_IN_BROWSER, openInBrowser, openInBrowserView));
 
         final ActionView.Builder startStreamLogView = new ActionView.Builder("Start Streaming Logs", AzureIcons.Action.LOG.getIconPath())
@@ -59,6 +61,14 @@ public class AppServiceActionsContributor implements IActionsContributor {
             .title(s -> Optional.ofNullable(s).map(r -> description("webapp.connect_ssh.app", ((AppServiceAppBase<?, ?, ?>) r).getName())).orElse(null))
             .enabled(s -> s instanceof AppServiceAppBase<?, ?, ?> && ((AppServiceAppBase<?, ?, ?>) s).getFormalStatus().isRunning());
         am.registerAction(SSH_INTO_WEBAPP, new Action<>(SSH_INTO_WEBAPP, sshView));
+
+        final Consumer<AppServiceAppBase<?, ?, ?>> refresh = app -> AzureEventBus.emit("appservice.slot.refresh", app);
+        final ActionView.Builder refreshView = new ActionView.Builder("Refresh", AzureIcons.Action.REFRESH.getIconPath())
+                .title(s -> Optional.ofNullable(s).map(r -> description("appservice.list_deployments.app", ((AppServiceAppBase<?, ?, ?>) r).getName())).orElse(null))
+                .enabled(s -> s instanceof AppServiceAppBase);
+        final Action<AppServiceAppBase<?, ?, ?>> refreshAction = new Action<>(REFRESH_DEPLOYMENT_SLOTS, refresh, refreshView);
+        refreshAction.setShortcuts(am.getIDEDefaultShortcuts().refresh());
+        am.registerAction(REFRESH_DEPLOYMENT_SLOTS, refreshAction);
     }
 
     @Override

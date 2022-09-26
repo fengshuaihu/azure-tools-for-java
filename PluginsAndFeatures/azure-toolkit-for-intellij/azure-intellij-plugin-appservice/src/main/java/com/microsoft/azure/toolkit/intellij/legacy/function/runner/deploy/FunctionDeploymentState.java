@@ -13,16 +13,8 @@ import com.microsoft.azure.toolkit.ide.appservice.function.FunctionAppConfig;
 import com.microsoft.azure.toolkit.intellij.common.RunProcessHandlerMessenger;
 import com.microsoft.azure.toolkit.intellij.legacy.common.AzureRunProfileState;
 import com.microsoft.azure.toolkit.intellij.legacy.function.runner.core.FunctionUtils;
-import com.microsoft.azure.toolkit.lib.Azure;
-import com.microsoft.azure.toolkit.lib.appservice.entity.FunctionEntity;
-import com.microsoft.azure.toolkit.lib.appservice.function.AzureFunctions;
-import com.microsoft.azure.toolkit.lib.appservice.function.FunctionApp;
-import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppDraft;
-import com.microsoft.azure.toolkit.lib.common.bundle.AzureString;
-import com.microsoft.azure.toolkit.lib.common.exception.AzureExecutionException;
+import com.microsoft.azure.toolkit.lib.appservice.function.FunctionAppBase;
 import com.microsoft.azure.toolkit.lib.common.exception.AzureToolkitRuntimeException;
-import com.microsoft.azure.toolkit.lib.common.messager.AzureMessager;
-import com.microsoft.azure.toolkit.lib.common.messager.IAzureMessager;
 import com.microsoft.azure.toolkit.lib.common.operation.AzureOperation;
 import com.microsoft.azure.toolkit.lib.common.operation.OperationContext;
 import com.microsoft.azure.toolkit.lib.legacy.function.FunctionAppService;
@@ -31,30 +23,17 @@ import com.microsoft.azuretools.telemetry.TelemetryConstants;
 import com.microsoft.azuretools.telemetrywrapper.Operation;
 import com.microsoft.azuretools.telemetrywrapper.TelemetryManager;
 import com.microsoft.intellij.RunProcessHandler;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.retry.Retry;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.microsoft.azure.toolkit.intellij.common.AzureBundle.message;
-import static com.microsoft.azure.toolkit.lib.appservice.function.core.AzureFunctionsAnnotationConstants.ANONYMOUS;
 
-public class FunctionDeploymentState extends AzureRunProfileState<FunctionApp> {
+public class FunctionDeploymentState extends AzureRunProfileState<FunctionAppBase<?, ?, ?>> {
 
     private static final int LIST_TRIGGERS_MAX_RETRY = 5;
     private static final int LIST_TRIGGERS_RETRY_PERIOD_IN_SECONDS = 10;
@@ -85,61 +64,16 @@ public class FunctionDeploymentState extends AzureRunProfileState<FunctionApp> {
     @Nullable
     @Override
     @AzureOperation(name = "function.deploy_app", type = AzureOperation.Type.ACTION)
-    public FunctionApp executeSteps(@NotNull RunProcessHandler processHandler, @NotNull Operation operation) throws IOException {
+    public FunctionAppBase<?, ?, ?> executeSteps(@NotNull RunProcessHandler processHandler, @NotNull Operation operation) {
         final RunProcessHandlerMessenger messenger = new RunProcessHandlerMessenger(processHandler);
         OperationContext.current().setMessager(messenger);
-        final FunctionApp functionApp;
-        if (StringUtils.isEmpty(functionDeployConfiguration.getFunctionId())) {
-            functionApp = createFunctionApp(processHandler);
-        } else {
-            functionApp = Azure.az(AzureFunctions.class).functionApp(functionDeployConfiguration.getFunctionId());
-            assert functionApp != null : "Cannot find function app with id: " + functionDeployConfiguration.getFunctionId();
-            updateApplicationSettings(functionApp);
-        }
+        final FunctionAppBase<?, ?, ?> target = FunctionAppService.getInstance().createOrUpdateFunctionApp(deployModel.getFunctionAppConfig());
         stagingFolder = FunctionUtils.getTempStagingFolder();
         prepareStagingFolder(stagingFolder, processHandler, operation);
         // deploy function to Azure
-        FunctionAppService.getInstance().deployFunctionApp(functionApp, stagingFolder);
-        // list triggers after deployment
-        listHTTPTriggerUrls(functionApp);
+        FunctionAppService.getInstance().deployFunctionApp(target, stagingFolder);
         operation.trackProperties(OperationContext.action().getTelemetryProperties());
-        return functionApp;
-    }
-
-    private FunctionApp createFunctionApp(@NotNull RunProcessHandler processHandler) {
-        FunctionApp functionApp = Azure.az(AzureFunctions.class)
-                .functionApps(functionDeployConfiguration.getSubscriptionId())
-                .getOrDraft(functionDeployConfiguration.getAppName(), functionDeployConfiguration.getConfig().getResourceGroup().getName());
-        if (functionApp.exists()) {
-            return functionApp;
-        }
-        processHandler.setText(message("function.create.hint.creating", functionDeployConfiguration.getAppName()));
-        // Load app settings from security storage
-        final FunctionAppConfig config = deployModel.getFunctionAppConfig();
-        config.setAppSettings(functionDeployConfiguration.getAppSettings());
-        // create function app
-        functionApp = FunctionAppService.getInstance().createFunctionApp(config);
-        // update run configuration
-        functionDeployConfiguration.setFunctionId(functionApp.getId());
-        functionDeployConfiguration.getConfig().setAppSettings(functionApp.getAppSettings());
-        processHandler.setText(message("function.create.hint.created", functionDeployConfiguration.getAppName()));
-        return functionApp;
-    }
-
-    private void updateApplicationSettings(FunctionApp deployTarget) {
-        final Map<String, String> applicationSettings = functionDeployConfiguration.getAppSettings();
-        final Set<String> appSettingsToRemove = Optional.ofNullable(deployTarget.getAppSettings())
-                .map(settings -> settings.keySet().stream().filter(key -> !applicationSettings.containsKey(key)).collect(Collectors.toSet()))
-                .orElseGet(Collections::emptySet);
-        if (MapUtils.isEmpty(applicationSettings)) {
-            return;
-        }
-        AzureMessager.getMessager().info("Updating application settings...");
-        final FunctionAppDraft draft = (FunctionAppDraft) deployTarget.update();
-        draft.setAppSettings(applicationSettings);
-        appSettingsToRemove.forEach(draft::removeAppSetting);
-        draft.updateIfExist();
-        AzureMessager.getMessager().info("Update application settings successfully.");
+        return target;
     }
 
     @AzureOperation(
@@ -159,7 +93,7 @@ public class FunctionDeploymentState extends AzureRunProfileState<FunctionApp> {
             final Map<String, FunctionConfiguration> configMap =
                     FunctionUtils.prepareStagingFolder(folder, hostJsonPath, project, module, methods);
             operation.trackProperty(TelemetryConstants.TRIGGER_TYPE, StringUtils.join(FunctionUtils.getFunctionBindingList(configMap), ","));
-        } catch (final AzureExecutionException | IOException e) {
+        } catch (final Throwable e) {
             final String error = String.format("failed prepare staging folder[%s]", folder);
             throw new AzureToolkitRuntimeException(error, e);
         }
@@ -176,9 +110,10 @@ public class FunctionDeploymentState extends AzureRunProfileState<FunctionApp> {
             params = {"this.deployModel.getFunctionAppConfig().getName()"},
             type = AzureOperation.Type.TASK
     )
-    protected void onSuccess(FunctionApp result, @NotNull RunProcessHandler processHandler) {
+    protected void onSuccess(FunctionAppBase<?, ?, ?> result, @NotNull RunProcessHandler processHandler) {
         processHandler.setText(message("appService.deploy.hint.succeed"));
         processHandler.notifyComplete();
+        functionDeployConfiguration.setAppSettings(result.getAppSettings());
         FunctionUtils.cleanUpStagingFolder(stagingFolder);
     }
 
@@ -191,46 +126,5 @@ public class FunctionDeploymentState extends AzureRunProfileState<FunctionApp> {
     @Override
     protected Map<String, String> getTelemetryMap() {
         return deployModel.getTelemetryProperties();
-    }
-
-    private void listHTTPTriggerUrls(FunctionApp target) {
-        try {
-            final List<FunctionEntity> triggers = listFunctions(target);
-            final List<FunctionEntity> httpFunction = triggers.stream()
-                    .filter(function -> function.getTrigger() != null &&
-                            StringUtils.equalsIgnoreCase(function.getTrigger().getType(), HTTP_TRIGGER))
-                    .collect(Collectors.toList());
-            final List<FunctionEntity> anonymousTriggers = httpFunction.stream()
-                    .filter(bindingResource -> bindingResource.getTrigger() != null &&
-                            StringUtils.equalsIgnoreCase(bindingResource.getTrigger().getProperty(AUTH_LEVEL), ANONYMOUS))
-                    .collect(Collectors.toList());
-            if (CollectionUtils.isEmpty(httpFunction) || CollectionUtils.isEmpty(anonymousTriggers)) {
-                AzureMessager.getMessager().info(NO_ANONYMOUS_HTTP_TRIGGER);
-                return;
-            }
-            AzureMessager.getMessager().info(HTTP_TRIGGER_URLS);
-            anonymousTriggers.forEach(trigger -> AzureMessager.getMessager().info(String.format("\t %s : %s", trigger.getName(), trigger.getTriggerUrl())));
-            if (anonymousTriggers.size() < httpFunction.size()) {
-                AzureMessager.getMessager().info(UNABLE_TO_LIST_NONE_ANONYMOUS_HTTP_TRIGGERS);
-            }
-        } catch (final RuntimeException e) {
-            // show warning instead of exception for list triggers
-            AzureMessager.getMessager().warning(FAILED_TO_LIST_TRIGGERS);
-        }
-    }
-
-    // todo: Move to toolkit lib as shared task
-    private List<FunctionEntity> listFunctions(final FunctionApp functionApp) {
-        final int[] count = {0};
-        final IAzureMessager azureMessager = AzureMessager.getMessager();
-        return Mono.fromCallable(() -> {
-            final AzureString message = count[0]++ == 0 ?
-                    AzureString.fromString(SYNCING_TRIGGERS) : AzureString.format(SYNCING_TRIGGERS_WITH_RETRY, count[0], LIST_TRIGGERS_MAX_RETRY);
-            azureMessager.info(message);
-            return Optional.of(functionApp.listFunctions(true))
-                    .filter(CollectionUtils::isNotEmpty)
-                    .orElseThrow(() -> new AzureToolkitRuntimeException(NO_TRIGGERS_FOUNDED));
-        }).subscribeOn(Schedulers.boundedElastic())
-                .retryWhen(Retry.fixedDelay(LIST_TRIGGERS_MAX_RETRY - 1, Duration.ofSeconds(LIST_TRIGGERS_RETRY_PERIOD_IN_SECONDS))).block();
     }
 }

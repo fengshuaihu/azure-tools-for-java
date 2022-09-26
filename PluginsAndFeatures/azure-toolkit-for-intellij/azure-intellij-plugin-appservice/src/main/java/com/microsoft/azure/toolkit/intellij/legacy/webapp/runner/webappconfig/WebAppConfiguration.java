@@ -258,14 +258,6 @@ public class WebAppConfiguration extends AzureRunConfigurationBase<IntelliJWebAp
         webAppSettingModel.setWebAppName(name);
     }
 
-    public boolean isCreatingResGrp() {
-        return webAppSettingModel.isCreatingResGrp();
-    }
-
-    public void setCreatingResGrp(boolean isCreating) {
-        webAppSettingModel.setCreatingResGrp(isCreating);
-    }
-
     public String getResourceGroup() {
         return webAppSettingModel.getResourceGroup();
     }

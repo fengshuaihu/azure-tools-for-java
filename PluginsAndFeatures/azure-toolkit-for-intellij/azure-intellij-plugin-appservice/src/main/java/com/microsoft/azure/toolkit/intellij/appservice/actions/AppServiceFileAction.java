@@ -22,6 +22,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.Consumer;
 import com.intellij.util.messages.MessageBusConnection;
@@ -135,7 +136,7 @@ public class AppServiceFileAction {
                     public void beforeFileClosed(FileEditorManager source, VirtualFile file) {
                         try {
                             final String content = getTextEditorContent((TextEditor) fileEditor);
-                            if (file == virtualFile && !StringUtils.equals(content, originContent)) {
+                            if (Objects.equals(file, virtualFile) && !StringUtils.equals(content, originContent)) {
                                 final boolean result = AzureMessager.getMessager().confirm(SAVE_CHANGES, APP_SERVICE_FILE_EDITING);
                                 if (result) {
                                     contentSaver.consume(content);
@@ -226,7 +227,12 @@ public class AppServiceFileAction {
 
     @SneakyThrows
     private LightVirtualFile createVirtualFile(final String fileId, final String fullName, FileEditorManager manager) {
-        final LightVirtualFile virtualFile = new LightVirtualFile(fullName);
+        final LightVirtualFile virtualFile = new LightVirtualFile(fullName) {
+            @Override
+            public VirtualFile getParent() {
+                return VirtualFileManager.getInstance().findFileByNioPath(FileUtils.getTempDirectory().toPath());
+            }
+        };
         virtualFile.setFileType(FileTypeManager.getInstance().getFileTypeByFileName(fullName));
         virtualFile.setCharset(StandardCharsets.UTF_8);
         virtualFile.putUserData(APP_SERVICE_FILE_ID, fileId);

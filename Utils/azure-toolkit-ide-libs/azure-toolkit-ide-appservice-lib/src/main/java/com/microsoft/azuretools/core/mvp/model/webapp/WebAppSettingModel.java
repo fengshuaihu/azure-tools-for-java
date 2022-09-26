@@ -6,7 +6,6 @@
 package com.microsoft.azuretools.core.mvp.model.webapp;
 
 import com.azure.resourcemanager.appservice.models.LogLevel;
-import com.azure.resourcemanager.resources.fluentcore.arm.ResourceId;
 import com.microsoft.azure.toolkit.lib.appservice.model.JavaVersion;
 import com.microsoft.azure.toolkit.lib.appservice.model.OperatingSystem;
 import com.microsoft.azure.toolkit.lib.appservice.model.Runtime;
@@ -16,6 +15,7 @@ import lombok.Data;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +39,6 @@ public class WebAppSettingModel {
     private String newSlotConfigurationSource;
     // create related
     private String webAppName = "";
-    private boolean creatingResGrp = false;
     private String resourceGroup = "";
     private boolean creatingAppServicePlan = false;
     private String appServicePlanName = "";
@@ -62,6 +61,7 @@ public class WebAppSettingModel {
     private boolean enableApplicationLog = false;
     private String applicationLogLevel = LogLevel.ERROR.toString();
 
+    @Nullable
     public Runtime getRuntime() {
         if (StringUtils.isAllEmpty(operatingSystem, webAppContainer, webAppJavaVersion)) {
             return null;
@@ -81,7 +81,7 @@ public class WebAppSettingModel {
     }
 
     public Map<String, String> getTelemetryProperties(Map<String, String> properties) {
-        Map<String, String> result = new HashMap<>();
+        final Map<String, String> result = new HashMap<>();
         try {
             if (properties != null) {
                 result.putAll(properties);
@@ -97,7 +97,6 @@ public class WebAppSettingModel {
             result.put(TelemetryConstants.SUBSCRIPTIONID, getSubscriptionId());
             result.put(TelemetryConstants.CREATE_NEWWEBAPP, String.valueOf(isCreatingNew()));
             result.put(TelemetryConstants.CREATE_NEWASP, String.valueOf(isCreatingAppServicePlan()));
-            result.put(TelemetryConstants.CREATE_NEWRG, String.valueOf(isCreatingResGrp()));
             result.put(TelemetryConstants.FILETYPE, FilenameUtils.getExtension(getTargetName()));
             result.put(TelemetryConstants.PRICING_TIER, pricing);
             result.put(TelemetryConstants.REGION, region);
