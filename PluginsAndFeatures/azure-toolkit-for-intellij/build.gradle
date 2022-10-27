@@ -189,6 +189,7 @@ dependencies {
     compile project(':azure-intellij-plugin-applicationinsights')
     compile project(':azure-intellij-plugin-guidance')
     compile project(':azure-intellij-plugin-cosmos')
+    compile project(':azure-intellij-plugin-hdinsight')
     compile 'com.microsoft.azure:azure-toolkit-ide-appservice-lib'
     compile 'com.microsoft.azure:azure-toolkit-applicationinsights-lib'
     compile 'com.microsoft.azure:azure-toolkit-storage-lib'
