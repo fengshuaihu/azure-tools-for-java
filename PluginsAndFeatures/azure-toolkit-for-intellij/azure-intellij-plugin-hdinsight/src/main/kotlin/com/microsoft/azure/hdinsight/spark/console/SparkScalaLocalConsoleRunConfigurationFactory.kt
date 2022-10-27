@@ -26,7 +26,7 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.microsoft.azure.hdinsight.spark.run.SparkLocalRun
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 import org.jetbrains.plugins.scala.console.configuration.ScalaConsoleRunConfiguration
 import org.jetbrains.plugins.scala.console.configuration.ScalaConsoleRunConfigurationFactory
 

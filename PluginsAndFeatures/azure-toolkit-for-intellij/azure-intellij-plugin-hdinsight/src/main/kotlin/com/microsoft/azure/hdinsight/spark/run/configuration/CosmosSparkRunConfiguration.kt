@@ -29,6 +29,7 @@ import com.intellij.openapi.project.Project
 import com.microsoft.azure.hdinsight.spark.common.CosmosSparkConfigurableModel
 import com.microsoft.azure.hdinsight.spark.run.action.SparkApplicationType
 import com.microsoft.azure.hdinsight.spark.ui.CosmosSparkConfigurable
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 
 open class CosmosSparkRunConfiguration (project: Project,
                                         name: String,

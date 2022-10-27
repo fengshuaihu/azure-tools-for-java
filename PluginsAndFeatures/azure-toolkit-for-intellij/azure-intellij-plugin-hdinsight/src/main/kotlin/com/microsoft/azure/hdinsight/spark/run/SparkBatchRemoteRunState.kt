@@ -32,7 +32,7 @@ import com.intellij.execution.ui.ConsoleViewContentType
 import com.microsoft.azure.hdinsight.common.classifiedexception.ClassifiedExceptionFactory
 import com.microsoft.azure.hdinsight.common.print
 import com.microsoft.azure.hdinsight.spark.common.ISparkBatchJob
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import com.microsoft.azuretools.telemetry.TelemetryProperties
 import com.microsoft.azuretools.telemetrywrapper.Operation
 import com.microsoft.intellij.hdinsight.messages.HDInsightBundle

@@ -28,6 +28,7 @@ import com.microsoft.azure.hdinsight.sdk.cluster.ClusterDetail
 import com.microsoft.azure.hdinsight.sdk.cluster.HDInsightAdditionalClusterDetail
 import com.microsoft.azure.hdinsight.sdk.common.AuthType
 import com.microsoft.azure.hdinsight.serverexplore.hdinsightnode.HDInsightRootModule
+import com.microsoft.azure.toolkit.intellij.hdinsight.serverexplore.ui.AddNewClusterForm
 import org.apache.commons.lang3.StringUtils.EMPTY
 import org.apache.commons.lang3.StringUtils.isBlank
 import java.awt.event.WindowAdapter

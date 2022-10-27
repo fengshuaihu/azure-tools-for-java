@@ -27,6 +27,9 @@ import com.intellij.execution.configurations.RunProfile
 import com.microsoft.azure.hdinsight.sdk.common.azure.serverless.AzureSparkCosmosClusterManager
 import com.microsoft.azure.hdinsight.spark.common.*
 import com.microsoft.azure.hdinsight.spark.run.configuration.CosmosSparkRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.SparkBatchJobRunExecutor
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.SparkBatchJobRunner
 import rx.Observable
 import rx.Observable.just
 import java.net.URI

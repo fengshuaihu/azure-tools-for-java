@@ -23,7 +23,8 @@
 package com.microsoft.azure.hdinsight.spark.run
 
 import com.microsoft.azure.hdinsight.spark.run.action.SparkApplicationType
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfigurationType
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.SparkBatchJobLocalRunConfigurationProducer
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfigurationType
 
 class LivySparkRunConfigurationProducer : SparkBatchJobLocalRunConfigurationProducer(
         LivySparkBatchJobRunConfigurationType.getInstance(),

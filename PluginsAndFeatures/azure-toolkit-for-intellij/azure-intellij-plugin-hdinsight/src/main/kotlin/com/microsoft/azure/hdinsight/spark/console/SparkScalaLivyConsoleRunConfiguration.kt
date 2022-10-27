@@ -44,11 +44,12 @@ import com.microsoft.azure.hdinsight.sdk.cluster.LivyCluster
 import com.microsoft.azure.hdinsight.sdk.cluster.MfaEspCluster
 import com.microsoft.azure.hdinsight.sdk.common.livy.interactive.SparkSession
 import com.microsoft.azure.hdinsight.spark.common.Deployable
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import com.microsoft.azure.hdinsight.spark.common.SparkSubmitStorageType
-import com.microsoft.azure.hdinsight.spark.run.SparkBatchJobDeployFactory
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.SparkBatchJobDeployFactory
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 import com.microsoft.azure.hdinsight.spark.run.configuration.RunProfileStatePrepare
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.console.SparkScalaLivyConsoleRunConfigurationEditor
 import org.apache.commons.lang3.exception.ExceptionUtils
 import rx.Observable
 import java.net.URI
@@ -92,7 +93,7 @@ open class SparkScalaLivyConsoleRunConfiguration(project: Project,
 
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-            SparkScalaLivyConsoleRunConfigurationEditor()
+        SparkScalaLivyConsoleRunConfigurationEditor()
 
     override fun getValidModules(): MutableCollection<Module> {
         val moduleName = batchRunConfiguration?.model?.localRunConfigurableModel?.classpathModule

@@ -25,7 +25,7 @@ package com.microsoft.azure.hdinsight.spark.run
 import com.intellij.execution.configurations.RemoteConnection
 import com.intellij.execution.configurations.RemoteState
 import com.microsoft.azure.hdinsight.spark.common.ISparkBatchJob
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import com.microsoft.azuretools.telemetrywrapper.Operation
 
 open class SparkBatchRemoteDebugState(serverlessSparkSubmitModel: SparkSubmitModel,

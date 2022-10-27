@@ -39,7 +39,7 @@ import com.intellij.uiDesigner.core.GridConstraints.*
 import com.microsoft.azure.cosmosspark.common.JXHyperLinkWithUri
 import com.microsoft.azure.hdinsight.common.AbfsUri
 import com.microsoft.azure.hdinsight.common.ClusterManagerEx
-import com.microsoft.azure.hdinsight.common.DarkThemeManager
+import com.microsoft.azure.toolkit.intellij.hdinsight.common.DarkThemeManager
 import com.microsoft.azure.hdinsight.common.logger.ILogger
 import com.microsoft.azure.hdinsight.common.mvc.SettableControl
 import com.microsoft.azure.hdinsight.sdk.cluster.ClusterDetail
@@ -48,13 +48,12 @@ import com.microsoft.azure.hdinsight.sdk.cluster.IClusterDetail
 import com.microsoft.azure.hdinsight.sdk.storage.IHDIStorageAccount
 import com.microsoft.azure.hdinsight.serverexplore.ui.AddNewHDInsightReaderClusterForm
 import com.microsoft.azure.hdinsight.spark.common.SparkSubmissionJobConfigCheckStatus
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmissionJobConfigCheckStatus.Error
 import com.microsoft.azure.hdinsight.spark.common.SparkSubmissionJobConfigCheckStatus.Warning
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitHelper
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
-import com.microsoft.azure.hdinsight.spark.common.SubmissionTableModel
-import com.microsoft.azure.hdinsight.spark.ui.filesystem.AzureStorageVirtualFile
-import com.microsoft.azure.hdinsight.spark.ui.filesystem.StorageChooser
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitHelper
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SubmissionTableModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.filesystem.AzureStorageVirtualFile
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.filesystem.StorageChooser
 import com.microsoft.azure.toolkit.lib.common.task.AzureTask
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager
 import com.microsoft.azuretools.authmanage.IdeAzureAccount
@@ -303,7 +302,10 @@ open class SparkSubmissionContentPanel(private val myProject: Project, val type:
         } else if (listChildrenErrorMessage != null) {
             StorageChooser.handleListChildrenFailureInfo(listChildrenErrorMessage)
         } else {
-            val chooser = StorageChooser(root) { file -> file.isDirectory || file.name.endsWith(".jar") }
+            val chooser =
+                StorageChooser(
+                    root
+                ) { file -> file.isDirectory || file.name.endsWith(".jar") }
             val chooseFiles = chooser.chooseFile()
             // Only override reference jar text field when jar file is selected and ok button is clicked
             if (chooseFiles.isNotEmpty()) {
@@ -333,7 +335,11 @@ open class SparkSubmissionContentPanel(private val myProject: Project, val type:
         } else if (listChildrenErrorMessage != null) {
             StorageChooser.handleListChildrenFailureInfo(listChildrenErrorMessage)
         } else {
-            val chooser = StorageChooser(root, StorageChooser.ALL_DIRS_AND_FILES)
+            val chooser =
+                StorageChooser(
+                    root,
+                    StorageChooser.ALL_DIRS_AND_FILES
+                )
             val chooseFiles = chooser.chooseFile()
             if (chooseFiles.isNotEmpty()) {
                 // Warning: We have overridden toString method in class AdlsGen2VirtualFile

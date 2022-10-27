@@ -26,7 +26,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.microsoft.azure.hdinsight.sdk.common.azure.serverless.AzureSparkCosmosCluster
 import com.microsoft.azure.hdinsight.spark.common.CosmosSparkSubmitModel
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 
 class CosmosSparkSubmissionPanel(project: Project)
     : SparkSubmissionContentPanel(project, "Spark on Cosmos") {

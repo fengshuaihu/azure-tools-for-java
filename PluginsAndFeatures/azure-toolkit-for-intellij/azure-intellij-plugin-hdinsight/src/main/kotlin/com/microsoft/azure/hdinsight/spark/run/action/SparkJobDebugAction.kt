@@ -28,9 +28,8 @@ import com.intellij.execution.RunManagerEx
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.microsoft.azure.hdinsight.common.CommonConst
-import com.microsoft.azure.hdinsight.common.StreamUtil
-import com.microsoft.azure.hdinsight.spark.run.SparkBatchJobDebugExecutor.EXECUTOR_ID
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.SparkBatchJobDebugExecutor.EXECUTOR_ID
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 import com.microsoft.azuretools.telemetry.TelemetryConstants
 import com.microsoft.intellij.util.PluginUtil
 

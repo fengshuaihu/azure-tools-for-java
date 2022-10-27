@@ -44,10 +44,10 @@ import com.microsoft.azure.hdinsight.spark.common.SparkSubmitStorageType
 import com.microsoft.azure.hdinsight.spark.common.SparkSubmitStorageType.*
 import com.microsoft.azure.hdinsight.spark.ui.ImmutableComboBoxModel.Companion.empty
 import com.microsoft.azure.hdinsight.spark.ui.SparkSubmissionJobUploadStorageBasicCard.StorageCheckEvent.SelectedStorageTypeEvent
-import com.microsoft.azure.hdinsight.spark.ui.filesystem.ADLSGen2FileSystem
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.filesystem.ADLSGen2FileSystem
 import com.microsoft.azure.hdinsight.spark.ui.filesystem.AdlsGen2VirtualFile
-import com.microsoft.azure.hdinsight.spark.ui.filesystem.AzureStorageVirtualFile
-import com.microsoft.azure.hdinsight.spark.ui.filesystem.AzureStorageVirtualFileSystem
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.filesystem.AzureStorageVirtualFile
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.filesystem.AzureStorageVirtualFileSystem
 import com.microsoft.intellij.forms.dsl.panel
 import com.microsoft.intellij.rxjava.DisposableObservers
 import com.microsoft.intellij.rxjava.IdeaSchedulers
@@ -303,7 +303,11 @@ open class SparkSubmissionJobUploadStoragePanel
                             SharedKeyHttpObservable(account, accessKey)
                         }
 
-                    val fileSystem = ADLSGen2FileSystem(http, uploadRootPathUri)
+                    val fileSystem =
+                        ADLSGen2FileSystem(
+                            http,
+                            uploadRootPathUri
+                        )
                     return AdlsGen2VirtualFile(uploadRootPathUri, true, fileSystem)
                 }
                 else -> {

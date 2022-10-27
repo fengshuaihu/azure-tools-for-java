@@ -25,7 +25,7 @@ package com.microsoft.azure.hdinsight.spark.run.configuration
 import com.intellij.execution.configurations.RuntimeConfigurationWarning
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import com.microsoft.azure.hdinsight.spark.run.action.SparkApplicationType
 import com.microsoft.azure.hdinsight.spark.ui.ArcadiaSparkClusterListRefreshableCombo
 import com.microsoft.azure.hdinsight.spark.ui.SparkClusterListRefreshableCombo

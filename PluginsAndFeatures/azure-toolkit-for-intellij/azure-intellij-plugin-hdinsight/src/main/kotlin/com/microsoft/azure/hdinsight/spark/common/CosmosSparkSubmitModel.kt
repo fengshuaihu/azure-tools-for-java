@@ -24,10 +24,11 @@ package com.microsoft.azure.hdinsight.spark.common
 
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.annotations.Attribute
-import com.microsoft.azuretools.utils.Pair
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import java.util.stream.Stream
 
-open class CosmosSparkSubmitModel : SparkSubmitModel {
+open class CosmosSparkSubmitModel :
+    SparkSubmitModel {
     @Attribute("tenant_id")
     var tenantId: String = "common"
     @Attribute("account_name")

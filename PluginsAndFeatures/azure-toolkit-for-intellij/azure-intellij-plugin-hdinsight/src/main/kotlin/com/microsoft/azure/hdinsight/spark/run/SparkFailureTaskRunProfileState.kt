@@ -36,7 +36,7 @@ import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.util.JavaParametersUtil
 import com.intellij.openapi.util.io.FileUtil
 import com.microsoft.azure.hdinsight.spark.common.SparkFailureTaskDebugConfigurableModel
-import com.microsoft.azure.hdinsight.spark.ui.SparkJobLogConsoleView
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.SparkJobLogConsoleView
 import com.microsoft.azuretools.telemetrywrapper.ErrorType
 import com.microsoft.azuretools.telemetrywrapper.EventType
 import com.microsoft.azuretools.telemetrywrapper.EventUtil
@@ -63,7 +63,8 @@ open class SparkFailureTaskRunProfileState(val name: String,
         validate(executor)
 
         // Leverage Spark Local Run/Debug console view
-        val consoleView = SparkJobLogConsoleView(project)
+        val consoleView =
+            SparkJobLogConsoleView(project)
         val processHandler = KillableColoredProcessHandler(createCommandLine()).apply {
             addProcessListener(object: ProcessAdapter() {
                 override fun processTerminated(event: ProcessEvent) {

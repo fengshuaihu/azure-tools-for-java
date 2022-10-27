@@ -33,7 +33,7 @@ import com.intellij.openapi.actionSystem.UpdateInBackground
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.roots.TestSourcesFilter.isTestSources
 import com.microsoft.azure.hdinsight.common.logger.ILogger
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 import com.microsoft.azure.hdinsight.spark.run.getNormalizedClassNameForSpark
 import com.microsoft.azure.hdinsight.spark.run.getSparkConfigurationContext
 import com.microsoft.azure.hdinsight.spark.run.getSparkMainClassWithElement

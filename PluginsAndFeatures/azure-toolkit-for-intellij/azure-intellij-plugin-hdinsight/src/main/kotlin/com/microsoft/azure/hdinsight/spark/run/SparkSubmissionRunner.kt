@@ -23,12 +23,9 @@
 package com.microsoft.azure.hdinsight.spark.run
 
 import com.intellij.execution.configurations.RunConfiguration
-import com.microsoft.azure.hdinsight.common.MessageInfoType
 import com.microsoft.azure.hdinsight.spark.common.ISparkBatchJob
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import rx.Observable
-import rx.Observer
-import java.util.AbstractMap.SimpleImmutableEntry
 
 interface SparkSubmissionRunner {
     /**

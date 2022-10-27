@@ -37,10 +37,10 @@ import com.intellij.execution.util.JavaParametersUtil
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.PathUtil
-import com.microsoft.azure.hdinsight.spark.common.SparkLocalRunConfigurableModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkLocalRunConfigurableModel
 import com.microsoft.azure.hdinsight.spark.mock.SparkLocalRunner
-import com.microsoft.azure.hdinsight.spark.ui.SparkJobLogConsoleView
-import com.microsoft.azure.hdinsight.spark.ui.SparkLocalRunParamsPanel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.SparkJobLogConsoleView
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.SparkLocalRunParamsPanel
 import com.microsoft.azuretools.telemetrywrapper.ErrorType
 import com.microsoft.azuretools.telemetrywrapper.EventType
 import com.microsoft.azuretools.telemetrywrapper.EventUtil
@@ -63,7 +63,8 @@ open class SparkBatchLocalRunState(val myProject: Project,
     @Throws(ExecutionException::class)
     override fun execute(executor: Executor?, runner: ProgramRunner<*>): ExecutionResult? {
         // Spark Local Run/Debug
-        val consoleView = SparkJobLogConsoleView(myProject)
+        val consoleView =
+            SparkJobLogConsoleView(myProject)
         val processHandler = KillableColoredProcessHandler(createCommandlineForLocal(executor))
 
         return executor?.let {

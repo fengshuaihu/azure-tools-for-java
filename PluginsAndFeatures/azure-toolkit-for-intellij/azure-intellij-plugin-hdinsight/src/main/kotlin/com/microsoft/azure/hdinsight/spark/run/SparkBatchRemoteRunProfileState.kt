@@ -25,7 +25,7 @@ package com.microsoft.azure.hdinsight.spark.run
 import com.intellij.execution.ExecutionResult
 import com.intellij.execution.ui.ConsoleView
 import com.microsoft.azure.hdinsight.spark.common.ISparkBatchJob
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 
 interface SparkBatchRemoteRunProfileState {
     var executionResult: ExecutionResult?

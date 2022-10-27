@@ -49,7 +49,8 @@ import com.microsoft.azure.hdinsight.spark.common.DebugParameterDefinedException
 import com.microsoft.azure.hdinsight.spark.common.SparkBatchDebugSession
 import com.microsoft.azure.hdinsight.spark.common.SparkBatchRemoteDebugJobSshAuth.SSHAuthType.UseKeyFile
 import com.microsoft.azure.hdinsight.spark.common.SparkBatchRemoteDebugJobSshAuth.SSHAuthType.UsePassword
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitAdvancedConfigModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitAdvancedConfigModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.BackgroundTaskIndicator
 import com.microsoft.azure.toolkit.lib.common.task.AzureTask
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager
 import com.microsoft.intellij.forms.dsl.panel
@@ -167,7 +168,8 @@ class SparkSubmissionAdvancedConfigPanel: JPanel(), SettableControl<SparkSubmitA
         add(sshUseKeyFileRadioButton)
     }
 
-    val checkSshCertIndicator = BackgroundTaskIndicator("Verify SSH Authentication...")
+    val checkSshCertIndicator =
+        BackgroundTaskIndicator("Verify SSH Authentication...")
 
     private val helpButton = InplaceButton(IconButton("Help about connection to HDInsight using SSH", Help)) {
         BrowserUtil.browse(helpUrl)
@@ -311,7 +313,8 @@ class SparkSubmissionAdvancedConfigPanel: JPanel(), SettableControl<SparkSubmitA
     }
 
     val advConfModel: SparkSubmitAdvancedConfigModel
-            get() = SparkSubmitAdvancedConfigModel().apply { getData(this) }
+            get() = SparkSubmitAdvancedConfigModel()
+                .apply { getData(this) }
 
     private fun showSshKeyFileChooser() {
         val fileChooserDescriptor = FileChooserDescriptor(true, false, false, false, false, false)

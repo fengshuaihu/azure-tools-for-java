@@ -27,6 +27,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Toggleable
 import com.microsoft.azure.hdinsight.spark.run.configuration.*
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfigurationType
 import com.microsoft.intellij.AzureAnAction
 import com.microsoft.azuretools.telemetry.TelemetryConstants
 import com.microsoft.azuretools.telemetrywrapper.Operation

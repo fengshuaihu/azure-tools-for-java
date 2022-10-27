@@ -27,7 +27,7 @@ import com.intellij.execution.configurations.JavaParameters
 import com.intellij.execution.configurations.RemoteConnection
 import com.intellij.execution.configurations.RemoteState
 import com.intellij.openapi.project.Project
-import com.microsoft.azure.hdinsight.spark.common.SparkLocalRunConfigurableModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkLocalRunConfigurableModel
 import com.microsoft.azuretools.telemetrywrapper.Operation
 import com.microsoft.intellij.hdinsight.messages.HDInsightBundle
 

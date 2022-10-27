@@ -23,6 +23,7 @@
 package com.microsoft.azure.hdinsight.spark.ui
 
 import com.intellij.openapi.project.Project
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.SparkBatchJobConfigurable
 import com.microsoft.azuretools.telemetry.TelemetryConstants
 
 class CosmosSparkConfigurable(project: Project) : SparkBatchJobConfigurable(project) {

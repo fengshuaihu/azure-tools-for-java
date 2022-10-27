@@ -23,14 +23,17 @@
 package com.microsoft.azure.hdinsight.spark.run.configuration
 
 import com.intellij.openapi.project.Project
-import com.microsoft.azure.hdinsight.spark.common.SparkBatchJobConfigurableModel
-import com.microsoft.azure.hdinsight.spark.common.SparkLocalRunConfigurableModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkBatchJobConfigurableModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkLocalRunConfigurableModel
 
 class ArisSparkConfigurableModel(project: Project) : SparkBatchJobConfigurableModel(project) {
     private val arisSparkSubmitModel = ArisSparkSubmitModel(project)
 
     init {
-        localRunConfigurableModel = SparkLocalRunConfigurableModel(project)
+        localRunConfigurableModel =
+            SparkLocalRunConfigurableModel(
+                project
+            )
         submitModel = arisSparkSubmitModel
     }
 }

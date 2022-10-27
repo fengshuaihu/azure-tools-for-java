@@ -2,7 +2,7 @@ package com.microsoft.azure.hdinsight.spark.run.configuration
 
 import com.intellij.openapi.project.Project
 import com.microsoft.azure.hdinsight.spark.ui.CosmosServerlessSparkSubmissionPanel
-import com.microsoft.azure.hdinsight.spark.ui.SparkBatchJobConfigurable
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.SparkBatchJobConfigurable
 import com.microsoft.azure.hdinsight.spark.ui.SparkSubmissionContentPanel
 import com.microsoft.azuretools.telemetry.TelemetryConstants
 

@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.uiDesigner.core.GridConstraints
 import com.microsoft.azure.hdinsight.sdk.common.azure.serverless.AzureSparkServerlessAccount
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import com.microsoft.azure.hdinsight.spark.run.configuration.CosmosServerlessSparkSubmitModel
 import com.microsoft.azure.toolkit.lib.common.task.AzureTask
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager

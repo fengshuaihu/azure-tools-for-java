@@ -7,8 +7,7 @@ import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.Transient
 import com.intellij.util.xmlb.annotations.XCollection
 import com.microsoft.azure.hdinsight.sdk.rest.azure.serverless.spark.models.CreateSparkBatchJobParameters
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
-import com.microsoft.azuretools.utils.Pair
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 import java.util.stream.Stream
 
 class CosmosServerlessSparkSubmitModel(project: Project) : SparkSubmitModel(project,

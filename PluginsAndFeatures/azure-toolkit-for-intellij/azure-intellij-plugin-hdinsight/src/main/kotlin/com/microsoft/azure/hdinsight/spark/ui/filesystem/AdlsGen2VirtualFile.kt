@@ -25,6 +25,8 @@ package com.microsoft.azure.hdinsight.spark.ui.filesystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileSystem
 import com.microsoft.azure.hdinsight.common.AbfsUri
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.filesystem.ADLSGen2FileSystem
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.filesystem.AzureStorageVirtualFile
 import com.microsoft.azuretools.azurecommons.helpers.Nullable
 
 open class AdlsGen2VirtualFile(val abfsUri: AbfsUri, private val myIsDirectory: Boolean, private val myFileSystem: VirtualFileSystem) : AzureStorageVirtualFile() {

@@ -26,6 +26,7 @@ import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import com.microsoft.azure.hdinsight.spark.run.action.SparkApplicationType
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 
 class ArcadiaSparkConfiguration (
         project: Project,

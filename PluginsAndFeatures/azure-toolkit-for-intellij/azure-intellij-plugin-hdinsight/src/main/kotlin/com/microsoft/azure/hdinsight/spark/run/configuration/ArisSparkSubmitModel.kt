@@ -23,7 +23,7 @@
 package com.microsoft.azure.hdinsight.spark.run.configuration
 
 import com.intellij.openapi.project.Project
-import com.microsoft.azure.hdinsight.spark.common.SparkSubmitModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkSubmitModel
 
 class ArisSparkSubmitModel(project: Project) : SparkSubmitModel(project) {
     override fun getSparkClusterTypeDisplayName(): String = "Aris Spark cluster"

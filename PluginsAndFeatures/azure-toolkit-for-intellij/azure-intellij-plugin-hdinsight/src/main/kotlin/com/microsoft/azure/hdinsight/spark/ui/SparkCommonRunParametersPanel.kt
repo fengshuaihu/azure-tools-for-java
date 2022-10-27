@@ -28,7 +28,8 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.vfs.impl.jar.JarFileSystemImpl
 import com.intellij.packaging.impl.elements.ManifestFileUtil
 import com.intellij.uiDesigner.core.GridConstraints
-import com.microsoft.azure.hdinsight.common.DarkThemeManager
+import com.microsoft.azure.toolkit.intellij.hdinsight.common.DarkThemeManager
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.SparkBatchJobConfigurable
 import com.microsoft.intellij.forms.dsl.panel
 import com.microsoft.intellij.helpers.ManifestFileUtilsEx
 import java.awt.BorderLayout

@@ -47,7 +47,7 @@ import com.intellij.psi.search.ProjectScope
 import com.intellij.util.PathUtil.getJarPathForClass
 import com.microsoft.azure.hdinsight.spark.mock.SparkLocalConsoleMockFsAgent
 import com.microsoft.azure.hdinsight.spark.run.SparkBatchLocalRunState
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 import com.microsoft.intellij.ui.ErrorWindow
 import com.microsoft.intellij.util.runInWriteAction
 import org.jetbrains.plugins.scala.console.configuration.ScalaConsoleRunConfiguration

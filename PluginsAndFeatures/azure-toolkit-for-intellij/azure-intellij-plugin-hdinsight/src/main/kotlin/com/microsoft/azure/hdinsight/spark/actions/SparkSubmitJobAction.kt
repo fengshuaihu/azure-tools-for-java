@@ -30,13 +30,13 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx
 import com.microsoft.azure.hdinsight.sdk.cluster.IClusterDetail
-import com.microsoft.azure.hdinsight.spark.actions.SparkDataKeys.*
-import com.microsoft.azure.hdinsight.spark.run.SparkBatchJobRunExecutor
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.actions.SparkDataKeys.*
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.SparkBatchJobRunExecutor
 import com.microsoft.azure.hdinsight.spark.run.action.RunConfigurationActionUtils
 import com.microsoft.azure.hdinsight.spark.run.action.SelectSparkApplicationTypeAction
 import com.microsoft.azure.hdinsight.spark.run.action.SeqActions
 import com.microsoft.azure.hdinsight.spark.run.action.SparkApplicationType
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
 import com.microsoft.intellij.AzureAnAction
 import com.microsoft.azuretools.telemetry.TelemetryConstants
 import com.microsoft.azuretools.telemetrywrapper.Operation
@@ -94,7 +94,8 @@ open class SparkSubmitJobAction : AzureAnAction() {
 
         runConfigurationSetting.isEditBeforeRun = true
 
-        val runConfiguration = runConfigurationSetting.configuration as? LivySparkBatchJobRunConfiguration ?: return
+        val runConfiguration = runConfigurationSetting.configuration as? LivySparkBatchJobRunConfiguration
+            ?: return
         val model = runConfiguration.model
         model.focusedTabIndex = 1   // Select remote job submission tab
 

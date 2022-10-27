@@ -23,12 +23,17 @@
 package com.microsoft.azure.hdinsight.spark.common
 
 import com.intellij.openapi.project.Project
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkBatchJobConfigurableModel
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.common.SparkLocalRunConfigurableModel
 
 open class CosmosSparkConfigurableModel(project: Project) : SparkBatchJobConfigurableModel(project) {
     private val cosmosSparkSubmitModel = CosmosSparkSubmitModel(project)
 
     init {
-        localRunConfigurableModel = SparkLocalRunConfigurableModel(project)
+        localRunConfigurableModel =
+            SparkLocalRunConfigurableModel(
+                project
+            )
         submitModel = cosmosSparkSubmitModel
     }
 }

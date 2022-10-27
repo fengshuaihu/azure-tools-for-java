@@ -39,8 +39,8 @@ import com.microsoft.azure.hdinsight.spark.run.SparkLocalRun
 import com.microsoft.azure.hdinsight.spark.run.action.RunConfigurationActionUtils
 import com.microsoft.azure.hdinsight.spark.run.action.SelectSparkApplicationTypeAction
 import com.microsoft.azure.hdinsight.spark.run.action.SparkApplicationType
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
-import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfigurationType
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfigurationType
 import com.microsoft.intellij.AzureAnAction
 import com.microsoft.azuretools.telemetrywrapper.Operation
 import com.microsoft.intellij.telemetry.TelemetryKeys
@@ -48,7 +48,6 @@ import com.microsoft.intellij.util.runInReadAction
 import org.jetbrains.plugins.scala.console.actions.RunConsoleAction
 import org.jetbrains.plugins.scala.console.configuration.ScalaConsoleRunConfigurationFactory
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import scala.Function1
 import scala.runtime.BoxedUnit
 
 abstract class RunSparkScalaConsoleAction

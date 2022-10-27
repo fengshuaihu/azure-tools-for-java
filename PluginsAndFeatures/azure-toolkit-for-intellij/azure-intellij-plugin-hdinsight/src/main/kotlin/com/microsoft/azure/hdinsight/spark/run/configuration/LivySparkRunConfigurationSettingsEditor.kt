@@ -31,7 +31,8 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.util.Disposer
 import com.microsoft.azure.hdinsight.common.logger.ILogger
-import com.microsoft.azure.hdinsight.spark.ui.SparkBatchJobConfigurable
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.intellij.hdinsight.spark.ui.SparkBatchJobConfigurable
 import com.microsoft.intellij.telemetry.addTelemetryListener
 import javax.swing.JComponent
 
