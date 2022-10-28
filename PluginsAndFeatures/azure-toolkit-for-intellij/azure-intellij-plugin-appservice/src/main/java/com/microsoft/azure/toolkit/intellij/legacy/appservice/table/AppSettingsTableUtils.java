@@ -9,7 +9,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.ui.AnActionButton;
+import com.intellij.ui.SearchTextField;
 import com.intellij.ui.ToolbarDecorator;
+import com.microsoft.azure.toolkit.intellij.common.TextDocumentListenerAdapter;
 import com.nimbusds.jose.util.ArrayUtils;
 
 import javax.annotation.Nonnull;
@@ -41,7 +43,15 @@ public class AppSettingsTableUtils {
         final ToolbarDecorator tableToolbarDecorator = ToolbarDecorator.createDecorator(appSettingsTable)
                 .addExtraActions(ArrayUtils.concat(actionButtons, additionalActions))
                 .setMinimumSize(new Dimension(-1, 120))
-                .setToolbarPosition(ActionToolbarPosition.RIGHT);
-        return tableToolbarDecorator.createPanel();
+                .setToolbarPosition(ActionToolbarPosition.TOP);
+        final SearchTextField searchTextField = new SearchTextField();
+        searchTextField.addDocumentListener((TextDocumentListenerAdapter) () -> {
+            final String stringToFilter = searchTextField.getText();
+            appSettingsTable.filter(stringToFilter);
+        });
+        appSettingsTable.setDefaultRenderer(Object.class, new HighLightedCellRenderer(searchTextField.getTextEditor()));
+        final JPanel panel = tableToolbarDecorator.createPanel();
+        tableToolbarDecorator.getActionsPanel().add(searchTextField, BorderLayout.WEST);
+        return panel;
     }
 }

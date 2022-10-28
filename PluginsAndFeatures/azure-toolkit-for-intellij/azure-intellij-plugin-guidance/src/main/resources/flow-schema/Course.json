@@ -28,7 +28,7 @@
       "format": "uri"
     },
     "tags": {
-      "description": "tag of the project",
+      "description": "tags of the project",
       "type": "array",
       "default": []
     },

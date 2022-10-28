@@ -55,6 +55,7 @@ public class IntellijStorageActionsContributor implements IActionsContributor {
         am.registerHandler(StorageActionsContributor.CREATE_FILE, (file, e) -> StorageFileActions.createFile(file, ((AnActionEvent) e).getProject()));
         am.registerHandler(StorageActionsContributor.CREATE_DIRECTORY, (file, e) -> StorageFileActions.createDirectory(file, ((AnActionEvent) e).getProject()));
         am.registerHandler(StorageActionsContributor.UPLOAD_FILES, (file, e) -> StorageFileActions.uploadFiles(file, ((AnActionEvent) e).getProject()));
+        am.registerHandler(StorageActionsContributor.UPLOAD_FILE, (file, e) -> StorageFileActions.uploadFile(file, ((AnActionEvent) e).getProject()));
         am.registerHandler(StorageActionsContributor.DOWNLOAD_FILE, (file, e) -> StorageFileActions.downloadFile(file, ((AnActionEvent) e).getProject()));
         am.registerHandler(StorageActionsContributor.COPY_FILE_URL, (file, e) -> StorageFileActions.copyUrl(file, ((AnActionEvent) e).getProject()));
         am.registerHandler(StorageActionsContributor.COPY_FILE_SAS_URL, (file, e) -> StorageFileActions.copySasUrl(file, ((AnActionEvent) e).getProject()));

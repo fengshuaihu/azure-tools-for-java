@@ -51,7 +51,7 @@ public class FunctionPortForwarder extends AbstractPortForwarder {
 
     @Override
     protected PortForwarderWebSocketListener createWebSocketListener(SocketChannel socketChannel) {
-        return new FunctionPortForwarderWebSocketListener(socketChannel, socketChannel, this);
+        return new PortForwarderWebSocketListener(socketChannel, socketChannel, this);
     }
 
     private static String getCredential(final FunctionAppBase<?, ?, ?> target) {

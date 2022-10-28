@@ -59,12 +59,12 @@ public class SpringCloudActionsContributor implements IActionsContributor {
         openTestUrlAction.setShortcuts("control alt T");
         am.registerAction(OPEN_TEST_URL, openTestUrlAction);
 
-        final ActionView.Builder streamLogView = new ActionView.Builder("Streaming Log", AzureIcons.Action.LOG.getIconPath())
+        final ActionView.Builder streamLogView = new ActionView.Builder("Start Streaming Logs", AzureIcons.Action.LOG.getIconPath())
                 .title(s -> Optional.ofNullable(s).map(r -> description("springcloud.open_stream_log.app", ((SpringCloudApp) r).getName())).orElse(null))
                 .enabled(s -> s instanceof SpringCloudApp && ((AzResourceBase) s).getFormalStatus().isRunning());
         am.registerAction(STREAM_LOG_APP, new Action<>(STREAM_LOG_APP, streamLogView));
 
-        final ActionView.Builder streamLogInstanceView = new ActionView.Builder("Streaming Log", AzureIcons.Action.LOG.getIconPath())
+        final ActionView.Builder streamLogInstanceView = new ActionView.Builder("Start Streaming Logs", AzureIcons.Action.LOG.getIconPath())
                 .title(s -> Optional.ofNullable(s).map(r -> description("springcloud.open_stream_log.instance", ((SpringCloudAppInstance) r).getName())).orElse(null))
                 .enabled(s -> s instanceof SpringCloudAppInstance && ((AzResourceBase) s).getFormalStatus().isRunning());
         am.registerAction(STREAM_LOG, new Action<>(STREAM_LOG, streamLogInstanceView));
@@ -86,12 +86,12 @@ public class SpringCloudActionsContributor implements IActionsContributor {
                         Optional.ofNullable(((SpringCloudApp) s).getActiveDeployment()).map(SpringCloudDeployment::isRemoteDebuggingEnabled).orElse(false));
         am.registerAction(DISABLE_REMOTE_DEBUGGING, new Action<>(DISABLE_REMOTE_DEBUGGING, disableRemoteDebuggingView));
 
-        final ActionView.Builder attachDebuggerToAppView = new ActionView.Builder("Attach Debugger", AzureIcons.Action.DEBUG.getIconPath())
+        final ActionView.Builder attachDebuggerToAppView = new ActionView.Builder("Attach Debugger", AzureIcons.Action.ATTACH_DEBUGGER.getIconPath())
                 .title(s -> Optional.ofNullable(s).map(r -> description("springcloud.attach_debugger.app", ((SpringCloudApp) r).getName())).orElse(null))
                 .enabled(s -> s instanceof SpringCloudApp && ((AzResourceBase) s).getFormalStatus().isRunning());
         am.registerAction(ATTACH_DEBUGGER_APP, new Action<>(ATTACH_DEBUGGER_APP, attachDebuggerToAppView));
 
-        final ActionView.Builder attachDebuggerView = new ActionView.Builder("Attach Debugger", AzureIcons.Action.DEBUG.getIconPath())
+        final ActionView.Builder attachDebuggerView = new ActionView.Builder("Attach Debugger", AzureIcons.Action.ATTACH_DEBUGGER.getIconPath())
                 .title(s -> Optional.ofNullable(s).map(r -> description("springcloud.attach_debugger.instance", ((SpringCloudAppInstance) r).getName())).orElse(null))
                 .enabled(s -> s instanceof SpringCloudAppInstance);
         am.registerAction(ATTACH_DEBUGGER, new Action<>(ATTACH_DEBUGGER, attachDebuggerView));
@@ -129,15 +129,16 @@ public class SpringCloudActionsContributor implements IActionsContributor {
             "---",
             ResourceCommonActionsContributor.DEPLOY,
             "---",
+            SpringCloudActionsContributor.ATTACH_DEBUGGER_APP,
+            SpringCloudActionsContributor.ENABLE_REMOTE_DEBUGGING,
+            SpringCloudActionsContributor.DISABLE_REMOTE_DEBUGGING,
+            "---",
             ResourceCommonActionsContributor.START,
             ResourceCommonActionsContributor.STOP,
             ResourceCommonActionsContributor.RESTART,
             ResourceCommonActionsContributor.DELETE,
             "---",
-            SpringCloudActionsContributor.STREAM_LOG_APP,
-            SpringCloudActionsContributor.ENABLE_REMOTE_DEBUGGING,
-            SpringCloudActionsContributor.DISABLE_REMOTE_DEBUGGING,
-            SpringCloudActionsContributor.ATTACH_DEBUGGER_APP
+            SpringCloudActionsContributor.STREAM_LOG_APP
         );
         am.registerGroup(APP_ACTIONS, appActionGroup);
 

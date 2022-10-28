@@ -12,6 +12,7 @@ import com.microsoft.azure.toolkit.lib.common.action.ActionView;
 import com.microsoft.azure.toolkit.lib.common.action.AzureActionManager;
 import com.microsoft.azure.toolkit.lib.common.bundle.AzureString;
 import com.microsoft.azure.toolkit.lib.common.exception.AzureToolkitRuntimeException;
+import com.microsoft.azure.toolkit.lib.common.model.AbstractAzResource;
 import com.microsoft.azure.toolkit.lib.storage.StorageAccount;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,6 +22,8 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -34,9 +37,31 @@ public abstract class AbstractAzureStorageExplorerHandler {
     private static final String STORAGE_EXPLORER_DOWNLOAD_URL = "https://go.microsoft.com/fwlink/?LinkId=723579";
     private static final String STORAGE_EXPLORER = "StorageExplorer";
 
-    public void openResource(@Nonnull final StorageAccount storageAccount) {
+    public void openResource(@Nonnull StorageAccount storageAccount) {
         // Get resource url
-        final String resourceUrl = "storageexplorer://v=1&accountid=" + storageAccount.getId() + "&subscriptionid=" + storageAccount.getSubscriptionId();
+        final Charset charset = Charset.forName("UTF-8");
+        String resourceUrl = "storageexplorer://v=1" +
+            "&accountid=" + URLEncoder.encode(storageAccount.getId(), charset) +
+            "&subscriptionid=" + URLEncoder.encode(storageAccount.getSubscriptionId(), charset) +
+            "&source=AzureToolkitForIntelliJ";
+        // try launch with uri
+        boolean result = launchStorageExplorerWithUri(storageAccount, resourceUrl);
+        if (!result) {
+            // fall back to launch with command
+            launchStorageExplorerThroughCommand(storageAccount, resourceUrl);
+        }
+    }
+
+    public void openResource(@Nonnull final AbstractAzResource<?, StorageAccount, ?> storage) {
+        // Get resource url
+        final StorageAccount storageAccount = storage.getParent();
+        final Charset charset = Charset.forName("UTF-8");
+        String resourceUrl = "storageexplorer://v=1" +
+            "&accountid=" + URLEncoder.encode(storageAccount.getId(), charset) +
+            "&subscriptionid=" + URLEncoder.encode(storageAccount.getSubscriptionId(), charset) +
+            "&source=AzureToolkitForIntelliJ" +
+            "&resourcetype=" + URLEncoder.encode(storage.getModule().getName(), charset) +
+            "&resourcename=" + URLEncoder.encode(storage.getName(), charset);
         // try launch with uri
         boolean result = launchStorageExplorerWithUri(storageAccount, resourceUrl);
         if (!result) {
@@ -53,7 +78,7 @@ public abstract class AbstractAzureStorageExplorerHandler {
                 final List<ProcessHandle> afterLaunchProcesses = ProcessHandle.allProcesses().collect(Collectors.toList());
                 final Collection<ProcessHandle> newProcesses = CollectionUtils.removeAll(afterLaunchProcesses, beforeLaunchProcesses);
                 return newProcesses.stream().map(ProcessHandle::info).map(ProcessHandle.Info::command)
-                        .anyMatch(command -> StringUtils.containsAnyIgnoreCase(command.orElse(StringUtils.EMPTY), STORAGE_EXPLORER));
+                    .anyMatch(command -> StringUtils.containsAnyIgnoreCase(command.orElse(StringUtils.EMPTY), STORAGE_EXPLORER));
             } catch (IOException e) {
                 log.info("failed to launch storage explorer from uri", e);
             }
@@ -83,17 +108,17 @@ public abstract class AbstractAzureStorageExplorerHandler {
     protected Action<?>[] getStorageNotFoundActions(@Nonnull final StorageAccount storageAccount) {
         // Open in Azure Action
         final Consumer<Void> openInAzureConsumer = ignore -> AzureActionManager.getInstance()
-                .getAction(ResourceCommonActionsContributor.OPEN_URL).handle(storageAccount.getPortalUrl() + "/storagebrowser");
+            .getAction(ResourceCommonActionsContributor.OPEN_URL).handle(storageAccount.getPortalUrl() + "/storagebrowser");
         final ActionView.Builder openInAzureView = new ActionView.Builder("Open in Azure")
-                .title(ignore -> AzureString.fromString("Open Storage account in Azure")).enabled(ignore -> true);
+            .title(ignore -> AzureString.fromString("Open Storage account in Azure")).enabled(ignore -> true);
         final Action.Id<Void> OPEN = Action.Id.of("storage.open_portal_storage_browser");
         final Action<Void> openInAzureAction = new Action<>(OPEN, openInAzureConsumer, openInAzureView);
         openInAzureAction.setAuthRequired(false);
         // Download Storage Explorer
         final Consumer<Void> downloadConsumer = ignore ->
-                AzureActionManager.getInstance().getAction(ResourceCommonActionsContributor.OPEN_URL).handle(STORAGE_EXPLORER_DOWNLOAD_URL);
+            AzureActionManager.getInstance().getAction(ResourceCommonActionsContributor.OPEN_URL).handle(STORAGE_EXPLORER_DOWNLOAD_URL);
         final ActionView.Builder downloadView = new ActionView.Builder("Download")
-                .title(ignore -> AzureString.fromString("Download Azure Storage Explorer")).enabled(ignore -> true);
+            .title(ignore -> AzureString.fromString("Download Azure Storage Explorer")).enabled(ignore -> true);
         final Action.Id<Void> DOWNLOAD = Action.Id.of("storage.download_explorer");
         final Action<Void> downloadAction = new Action<>(DOWNLOAD, downloadConsumer, downloadView);
         downloadAction.setAuthRequired(false);
@@ -106,7 +131,7 @@ public abstract class AbstractAzureStorageExplorerHandler {
             }
         };
         final ActionView.Builder configureView = new ActionView.Builder("Configure")
-                .title(ignore -> AzureString.fromString("Configure path for Azure Storage Explorer")).enabled(ignore -> true);
+            .title(ignore -> AzureString.fromString("Configure path for Azure Storage Explorer")).enabled(ignore -> true);
         final Action.Id<Void> CONFIG = Action.Id.of("storage.config_explorer_path");
         final Action<Void> configureAction = new Action<>(CONFIG, configureConsumer, configureView);
         configureAction.setAuthRequired(false);

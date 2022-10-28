@@ -16,7 +16,6 @@ public class AzureConfigInitializer {
     public static final String ACCOUNT = "account";
     public static final String FUNCTION = "function";
     public static final String DATABASE = "database";
-    public static final String NEW_FEATURE = "new_feature";
 
     public static final String TELEMETRY_PLUGIN_VERSION = "telemetry_plugin_version";
     public static final String AZURE_ENVIRONMENT_KEY = "azure_environment";

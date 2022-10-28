@@ -63,8 +63,8 @@ public class IntelliJAzureIcons {
             put(AzureIcons.Action.SFTP, AllIcons.Nodes.Servlet);
             put(AzureIcons.Action.UPLOAD, AllIcons.Actions.Upload);
             put(AzureIcons.Action.DOWNLOAD, AllIcons.Actions.Download);
-            put(AzureIcons.Action.DEBUG, AllIcons.Actions.StartDebugger);
-            put(AzureIcons.Action.ATTACH, AllIcons.Debugger.AttachToProcess);
+            put(AzureIcons.Action.ATTACH_DEBUGGER, AllIcons.Debugger.AttachToProcess);
+            put(AzureIcons.Action.REMOTE_DEBUG, AllIcons.RunConfigurations.RemoteDebug);
         }
     };
 

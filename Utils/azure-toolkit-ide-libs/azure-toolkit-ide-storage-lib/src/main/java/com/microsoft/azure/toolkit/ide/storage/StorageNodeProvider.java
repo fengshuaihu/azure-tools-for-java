@@ -78,7 +78,6 @@ public class StorageNodeProvider implements IExplorerNodeProvider {
                     .actions(StorageActionsContributor.STORAGE_MODULE_ACTIONS)
                     .addChildren(AbstractAzResourceModule::list, (d, mn) -> this.createNode(d, mn, manager)))
                 .inlineAction(ResourceCommonActionsContributor.PIN)
-//                .doubleClickAction(StorageActionsContributor.OPEN_AZURE_STORAGE_EXPLORER)
                 .actions(StorageActionsContributor.ACCOUNT_ACTIONS);
         } else if (data instanceof BlobContainer) {
             final BlobContainer container = (BlobContainer) data;

@@ -10,16 +10,25 @@ import com.microsoft.azure.toolkit.ide.common.portforwarder.PortForwarderWebSock
 import com.microsoft.azure.toolkit.lib.common.exception.AzureToolkitRuntimeException;
 import okhttp3.WebSocket;
 import okio.ByteString;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.function.BooleanSupplier;
 
 public class SpringPortForwarderWebSocketListener extends PortForwarderWebSocketListener {
     private int messagesRead = 0;
 
     public SpringPortForwarderWebSocketListener(ReadableByteChannel in, WritableByteChannel out, AbstractPortForwarder forwarder) {
         super(in, out, forwarder);
+    }
+
+    @Override
+    protected int readMessage(@NotNull ReadableByteChannel channel, @NotNull ByteBuffer buffer) throws IOException {
+        buffer.put((byte) 0);
+        return super.readMessage(channel, buffer);
     }
 
     @Override

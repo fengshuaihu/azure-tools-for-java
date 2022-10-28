@@ -48,12 +48,12 @@ import com.intellij.util.PathUtil.getJarPathForClass
 import com.microsoft.azure.hdinsight.spark.mock.SparkLocalConsoleMockFsAgent
 import com.microsoft.azure.hdinsight.spark.run.SparkBatchLocalRunState
 import com.microsoft.azure.hdinsight.spark.run.configuration.LivySparkBatchJobRunConfiguration
+import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager
 import com.microsoft.intellij.ui.ErrorWindow
 import com.microsoft.intellij.util.runInWriteAction
-import org.jetbrains.plugins.scala.console.configuration.ScalaConsoleRunConfiguration
 import org.jdom.Element
+import org.jetbrains.plugins.scala.console.configuration.ScalaConsoleRunConfiguration
 import java.nio.file.Paths
-import javax.swing.Action
 
 class SparkScalaLocalConsoleRunConfiguration(
         private val scalaConsoleRunConfDelegate: ScalaConsoleRunConfiguration,
@@ -188,34 +188,23 @@ class SparkScalaLocalConsoleRunConfiguration(
     }
 
     private fun promptAndFix(libraryCoord: String) {
-        val toFixDialog = object : ErrorWindow(
-                project,
+        AzureTaskManager.getInstance().runLater {
+            ErrorWindow.show(project,
                 "The library $libraryCoord is not in project dependencies, would you like to auto fix it?",
-                "Auto fix dependency issue to confirm") {
-            init {
-                setOKButtonText("Auto Fix")
-            }
-
-            override fun createActions(): Array<Action> {
-                return arrayOf(okAction, cancelAction)
-            }
-        }
-
-        val toFix = toFixDialog.showAndGet()
-
-        if (toFix) {
-            val progress = DispatchThreadProgressWindow(false, project).apply {
-                setRunnable {
-                    ProgressManager.getInstance().runProcess({
-                        text = "Download $libraryCoord ..."
-                        fixDependence(libraryCoord)
-                    }, this@apply)
-                }
-
-                title = "Auto fix dependency $libraryCoord"
-            }
-
-            progress.start()
+                "Auto fix dependency issue to confirm",
+                "Auto Fix",
+                Runnable {
+                    val progress = DispatchThreadProgressWindow(false, project).apply {
+                        setRunnable {
+                            ProgressManager.getInstance().runProcess({
+                                text = "Download $libraryCoord ..."
+                                fixDependence(libraryCoord)
+                            }, this@apply)
+                        }
+                        title = "Auto fix dependency $libraryCoord"
+                    }
+                    progress.start()
+                })
         }
     }
 

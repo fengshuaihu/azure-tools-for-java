@@ -5,45 +5,50 @@
 
 package com.microsoft.azure.toolkit.intellij.common.fileexplorer;
 
+import com.intellij.AppTopics;
 import com.intellij.ide.actions.RevealFileAction;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.TextEditor;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import com.microsoft.azure.toolkit.lib.common.action.Action;
 import com.microsoft.azure.toolkit.lib.common.action.ActionView;
 import com.microsoft.azure.toolkit.lib.common.bundle.AzureString;
 import com.microsoft.azure.toolkit.lib.common.messager.AzureMessager;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
+import lombok.experimental.Delegate;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class VirtualFileActions {
     private static final Key<String> FILE_ID = new Key<>("FILE_ID");
+    private static final Key<Boolean> FILE_CHANGED = new Key<>("FILE_CHANGED");
     private static final String FILE_EDITING = "Save File";
     private static final String SAVE_CHANGES = "Do you want to save your changes?";
     private static final String SUCCESS_DOWNLOADING = "File %s is successfully downloaded to %s.";
     private static final String NOTIFICATION_GROUP_ID = "Azure Plugin";
 
-    public static boolean openFileInEditor(final Consumer<? super String> onSave, VirtualFile virtualFile, FileEditorManager manager) {
+    public static boolean openFileInEditor(VirtualFile virtualFile, final Function<? super String, Boolean> onSave, Runnable onClose, FileEditorManager manager) {
         final Project project = manager.getProject();
         final FileEditor[] editors = manager.openFile(virtualFile, true, true);
         if (editors.length == 0) {
@@ -51,21 +56,35 @@ public class VirtualFileActions {
         }
         for (final FileEditor editor : editors) {
             if (editor instanceof TextEditor) {
-                final String originContent = getTextEditorContent((TextEditor) editor);
                 final MessageBusConnection messageBusConnection = manager.getProject().getMessageBus().connect(editor);
+                ((TextEditor) editor).getEditor().getDocument().addDocumentListener(new DocumentListener() {
+                    @Override
+                    public void documentChanged(@Nonnull DocumentEvent event) {
+                        virtualFile.putUserData(FILE_CHANGED, true);
+                    }
+                });
+                messageBusConnection.subscribe(AppTopics.FILE_DOCUMENT_SYNC, new FileDocumentManagerListener() {
+                    @Override
+                    public void beforeDocumentSaving(@Nonnull Document document) {
+                        if (Objects.equals(document, ((TextEditor) editor).getEditor().getDocument()) && Boolean.TRUE.equals(virtualFile.getUserData(FILE_CHANGED))) {
+                            if (onSave.apply(document.getText())) {
+                                virtualFile.putUserData(FILE_CHANGED, false);
+                            }
+                        }
+                    }
+                });
                 messageBusConnection.subscribe(FileEditorManagerListener.Before.FILE_EDITOR_MANAGER, new FileEditorManagerListener.Before() {
                     @Override
                     public void beforeFileClosed(FileEditorManager source, VirtualFile file) {
                         try {
-                            final String content = getTextEditorContent((TextEditor) editor);
-                            if (Objects.equals(file, virtualFile) && !StringUtils.equals(content, originContent)) {
-                                final boolean result = AzureMessager.getMessager().confirm(SAVE_CHANGES, FILE_EDITING);
-                                if (result) {
-                                    onSave.accept(content);
+                            if (Objects.equals(file, virtualFile) && Boolean.TRUE.equals(virtualFile.getUserData(FILE_CHANGED))) {
+                                if (AzureMessager.getMessager().confirm(SAVE_CHANGES, FILE_EDITING)) {
+                                    final String content = ((TextEditor) editor).getEditor().getDocument().getText();
+                                    onSave.apply(content);
                                 }
+                                virtualFile.putUserData(FILE_CHANGED, false);
+                                onClose.run();
                             }
-                        } catch (final RuntimeException e) {
-                            AzureMessager.getMessager().error(e);
                         } finally {
                             messageBusConnection.disconnect();
                         }
@@ -77,22 +96,22 @@ public class VirtualFileActions {
         return true;
     }
 
-    public static VirtualFile getOrCreateVirtualFile(String fileId, String name, FileEditorManager manager) {
+    public static VirtualFile getVirtualFile(String fileId, FileEditorManager manager) {
         return Arrays.stream(manager.getOpenFiles())
             .filter(f -> StringUtils.equals(f.getUserData(FILE_ID), fileId))
-            .findFirst().orElse(createVirtualFile(fileId, name, manager));
+            .findAny().orElse(null);
+    }
+
+    public static VirtualFile createVirtualFile(String fileId, String fileName, File file, FileEditorManager manager) {
+        return Arrays.stream(manager.getOpenFiles())
+            .filter(f -> StringUtils.equals(f.getUserData(FILE_ID), fileId))
+            .findAny().orElse(createTempVirtualFile(fileId, fileName, file, manager));
     }
 
     @SneakyThrows
-    private static LightVirtualFile createVirtualFile(final String fileId, final String fullName, FileEditorManager manager) {
-        final LightVirtualFile virtualFile = new LightVirtualFile(fullName) {
-            @Override
-            public VirtualFile getParent() {
-                return VirtualFileManager.getInstance().findFileByNioPath(FileUtils.getTempDirectory().toPath());
-            }
-        };
-        final FileType type = FileTypeManager.getInstance().getFileTypeByFileName(fullName);
-        virtualFile.setFileType(type == FileTypes.UNKNOWN ? FileTypes.PLAIN_TEXT : type);
+    private static VirtualFile createTempVirtualFile(final String fileId, final String fileName, File tempFile, FileEditorManager manager) {
+        final VirtualFile origin = Objects.requireNonNull(VfsUtil.findFileByIoFile(tempFile, true));
+        final VirtualFile virtualFile = new RemoteVirtualFile(origin, fileName);
         virtualFile.setCharset(StandardCharsets.UTF_8);
         virtualFile.putUserData(FILE_ID, fileId);
         virtualFile.setWritable(true);
@@ -127,5 +146,28 @@ public class VirtualFileActions {
                 fileEditorManager.openFile(virtualFile, true, true);
             }
         }), new ActionView.Builder("Open In Editor"));
+    }
+
+    @RequiredArgsConstructor
+    private static class RemoteVirtualFile extends VirtualFile {
+
+        @Delegate(types = VirtualFile.class, excludes = {Customize.class, UserDataHolderBase.class})
+        private final VirtualFile origin;
+        private final String path;
+
+        @Nonnull
+        public String getPresentableName() {
+            return path;
+        }
+
+        private interface Customize {
+            public String getPresentableName();
+
+            public String getPresentableUrl();
+
+            public void setBinaryContent(byte[] content) throws IOException;
+
+            public OutputStream getOutputStream(Object requestor) throws IOException;
+        }
     }
 }
