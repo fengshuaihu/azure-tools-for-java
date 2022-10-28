@@ -47,6 +47,7 @@
         <module>azure-toolkit-ide-applicationinsights-lib</module>
         <module>azure-toolkit-ide-containerservice-lib</module>
         <module>azure-toolkit-ide-cosmos-lib</module>
+        <module>azure-toolkit-ide-hdinsight-lib</module>
     </modules>
 
     <properties>
