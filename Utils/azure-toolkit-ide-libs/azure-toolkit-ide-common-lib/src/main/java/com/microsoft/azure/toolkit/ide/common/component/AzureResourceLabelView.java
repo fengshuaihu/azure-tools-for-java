@@ -17,6 +17,7 @@ import com.microsoft.azure.toolkit.lib.common.utils.TailingDebouncer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -42,6 +43,8 @@ public class AzureResourceLabelView<T extends AzResource> implements NodeView {
     @Setter
     @Getter
     private Refresher refresher;
+    @Setter
+    private String tips;
     @Getter
     private boolean enabled = true;
     private final Debouncer refreshViewInner = new TailingDebouncer(this::refreshViewInner, 300);
@@ -56,8 +59,13 @@ public class AzureResourceLabelView<T extends AzResource> implements NodeView {
 
     public AzureResourceLabelView(@Nonnull T resource, @Nonnull Function<T, String> descriptionLoader,
                                   @Nonnull final AzureIconProvider<? super T> iconProvider) {
+        this(resource, AzResource::getName, descriptionLoader, iconProvider);
+    }
+
+    public AzureResourceLabelView(@Nonnull T resource, @Nonnull Function<T, String> labelProvider, @Nonnull Function<T, String> descriptionLoader,
+                                  @Nonnull final AzureIconProvider<? super T> iconProvider) {
         this.resource = resource;
-        this.label = resource.getName();
+        this.label = labelProvider.apply(resource);
         this.iconProvider = iconProvider;
         this.descriptionLoader = descriptionLoader;
         this.listener = new AzureEventBus.EventListener(this::onEvent);
@@ -102,6 +110,11 @@ public class AzureResourceLabelView<T extends AzResource> implements NodeView {
         AzureEventBus.off("resource.status_changed.resource", listener);
         AzureEventBus.off("resource.children_changed.resource", listener);
         this.refresher = null;
+    }
+
+    @Override
+    public String getTips() {
+        return Optional.ofNullable(this.tips).filter(StringUtils::isNotBlank).orElseGet(NodeView.super::getTips);
     }
 
     @Override

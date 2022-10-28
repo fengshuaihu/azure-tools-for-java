@@ -162,8 +162,7 @@ public class PortForwarderWebSocketListener extends WebSocketListener {
         int read;
         do {
             buffer.clear();
-            buffer.put((byte) 0);
-            read = in.read(buffer);
+            read = readMessage(in, buffer);
             if (read > 0) {
                 buffer.flip();
                 webSocket.send(ByteString.of(buffer));
@@ -171,6 +170,10 @@ public class PortForwarderWebSocketListener extends WebSocketListener {
                 Thread.sleep(50L);
             }
         } while (isAlive.getAsBoolean() && read >= 0);
+    }
+
+    protected int readMessage(@NotNull ReadableByteChannel channel, @NotNull final ByteBuffer buffer) throws IOException {
+        return channel.read(buffer);
     }
 
     protected void awaitMoreRequest() {

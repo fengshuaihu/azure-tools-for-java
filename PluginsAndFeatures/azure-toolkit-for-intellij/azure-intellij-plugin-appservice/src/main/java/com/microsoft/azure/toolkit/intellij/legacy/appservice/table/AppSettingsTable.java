@@ -8,26 +8,19 @@ package com.microsoft.azure.toolkit.intellij.legacy.appservice.table;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.table.JBTable;
 import com.microsoft.azure.toolkit.ide.appservice.model.AppServiceConfig;
-import com.microsoft.azure.toolkit.lib.Azure;
-import com.microsoft.azure.toolkit.lib.appservice.AppServiceAppBase;
-import com.microsoft.azure.toolkit.lib.appservice.AzureAppService;
-import com.microsoft.azure.toolkit.lib.common.action.AzureActionManager;
 import com.microsoft.azure.toolkit.lib.common.messager.AzureMessager;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTask;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
 import com.microsoft.intellij.CommonConst;
 import lombok.Getter;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.microsoft.azure.toolkit.intellij.common.AzureBundle.message;
@@ -38,6 +31,7 @@ public class AppSettingsTable extends JBTable {
     protected AppServiceConfig config;
     @Getter
     protected boolean loading = false;
+    private final TableRowSorter<AppSettingModel> sorter;
 
     public AppSettingsTable() {
         super();
@@ -48,6 +42,8 @@ public class AppSettingsTable extends JBTable {
         this.setMinimumSize(new Dimension(-1, 150));
         this.setPreferredScrollableViewportSize(null);
         this.resetEmptyText();
+        this.sorter = new TableRowSorter<>(appSettingModel);
+        this.setRowSorter(sorter);
     }
 
     public int addRequiredAppSettings(@Nonnull final String key, final String value) {
@@ -65,6 +61,7 @@ public class AppSettingsTable extends JBTable {
 
     public void addAppSettings(@Nonnull String key, String value) {
         final int index = appSettingModel.addAppSettings(key, value);
+        appSettingModel.fireTableChanged();
         this.refresh();
         scrollToRow(index);
     }
@@ -73,7 +70,8 @@ public class AppSettingsTable extends JBTable {
         if (MapUtils.isEmpty(appSettingMap)) {
             return;
         }
-        appSettingMap.forEach((key, value) -> addAppSettings(key, value));
+        appSettingMap.forEach(appSettingModel::addAppSettings);
+        appSettingModel.fireTableChanged();
         this.refresh();
         scrollToRow(0);
     }
@@ -106,6 +104,16 @@ public class AppSettingsTable extends JBTable {
                 AzureTaskManager.getInstance().runLater(() -> AppSettingsTable.this.setLoading(false), AzureTask.Modality.ANY);
             }
         });
+    }
+
+    public void filter(String stringToFilter) {
+        final RowFilter<AppSettingModel, Object> rf;
+        try {
+            rf = RowFilter.regexFilter("(?i)" + stringToFilter);
+        } catch (final java.util.regex.PatternSyntaxException e) {
+            return;
+        }
+        this.sorter.setRowFilter(rf);
     }
 
     private void setLoading(boolean isLoading) {
@@ -143,10 +151,6 @@ public class AppSettingsTable extends JBTable {
     @Nonnull
     public Map<String, String> getAppSettings() {
         return appSettingModel.getAppSettings();
-    }
-
-    public boolean isEmpty() {
-        return appSettingModel.getRowCount() == 0;
     }
 
     private void scrollToRow(int target) {

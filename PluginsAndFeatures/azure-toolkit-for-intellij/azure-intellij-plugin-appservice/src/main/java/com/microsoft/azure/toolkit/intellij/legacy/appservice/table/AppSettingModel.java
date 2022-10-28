@@ -95,7 +95,6 @@ public class AppSettingModel implements TableModel {
         } else {
             appSettings.add(result);
         }
-        fireTableChanged();
         return index > 0 ? index : appSettings.size() - 1;
     }
 
@@ -116,6 +115,7 @@ public class AppSettingModel implements TableModel {
         fireTableChanged();
     }
 
+    @Nullable
     public String getAppSettingsKey(int row) {
         if (isRowInvalid(row)) {
             return null;

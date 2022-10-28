@@ -18,7 +18,6 @@ import com.microsoft.azure.toolkit.lib.common.action.Action;
 import com.microsoft.azure.toolkit.lib.common.operation.AzureOperation;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
 import com.microsoft.azure.toolkit.lib.common.view.IView;
-import com.microsoft.azure.toolkit.lib.resource.AzureResources;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.BooleanUtils;
@@ -37,8 +36,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.intellij.ui.AnimatedIcon.ANIMATION_IN_RENDERER_ALLOWED;
 
@@ -122,9 +123,9 @@ public class Tree extends SimpleTree implements DataProvider {
         @Nullable
         public IView.Label getInlineActionView() {
             return Optional.ofNullable(this.inner.inlineAction())
-                .map(a -> a.getView(this.inner.data()))
-                .filter(IView.Label::isEnabled)
-                .orElse(null);
+                    .map(a -> a.getView(this.inner.data()))
+                    .filter(IView.Label::isEnabled)
+                    .orElse(null);
         }
 
         @Override
@@ -152,7 +153,9 @@ public class Tree extends SimpleTree implements DataProvider {
             if (this.getAllowsChildren() && BooleanUtils.isNotFalse(this.loaded)) {
                 final DefaultTreeModel model = (DefaultTreeModel) this.tree.getModel();
                 if (incremental.length > 0 && incremental[0] && Objects.nonNull(model)) {
-                    model.insertNodeInto(new LoadingNode(), this, 0);
+                    this.removeLoadMoreNode();
+                    this.refreshChildrenView();
+                    model.insertNodeInto(new LoadingNode(), this, this.getChildCount());
                 } else {
                     this.removeAllChildren();
                     this.add(new LoadingNode());
@@ -182,33 +185,40 @@ public class Tree extends SimpleTree implements DataProvider {
         private synchronized void setChildren(List<Node<?>> children) {
             this.removeAllChildren();
             children.stream().map(c -> new TreeNode<>(c, this.tree)).forEach(this::add);
+            this.addLoadMoreNode();
             this.loaded = true;
             this.refreshChildrenView();
         }
 
         private synchronized void updateChildren(List<Node<?>> children) {
-            final Map<Object, DefaultMutableTreeNode> oldChildren = IntStream.range(1, this.getChildCount()).mapToObj(this::getChildAt)
-                .filter(n -> n instanceof DefaultMutableTreeNode).map(n -> ((DefaultMutableTreeNode) n))
-                .collect(Collectors.toMap(DefaultMutableTreeNode::getUserObject, n -> n));
+            final Map<Object, DefaultMutableTreeNode> oldChildren = IntStream.range(0, this.getChildCount() - 1).mapToObj(this::getChildAt)
+                    .filter(n -> n instanceof DefaultMutableTreeNode).map(n -> ((DefaultMutableTreeNode) n))
+                    .collect(Collectors.toMap(DefaultMutableTreeNode::getUserObject, n -> n));
 
             final Set<Object> newChildrenData = children.stream().map(Node::data).collect(Collectors.toSet());
             final Set<Object> oldChildrenData = oldChildren.keySet();
             Sets.difference(oldChildrenData, newChildrenData).forEach(o -> oldChildren.get(o).removeFromParent());
 
             TreePath toSelect = null;
-            for (int i = 0; i < children.size(); i++) {
-                final Node<?> node = children.get(i);
-                if (!oldChildrenData.contains(node.data())) {
-                    final TreeNode<?> treeNode = new TreeNode<>(node, this.tree);
-                    this.insert(treeNode, i + 1);
-                    toSelect = new TreePath(treeNode.getPath());
-                } else { // discarded nodes should be disposed manually to unregister listeners.
-                    node.dispose();
+            if (this.inner.newItemOrder() == Node.Order.LIST_ORDER) {
+                for (int i = 0; i < children.size(); i++) {
+                    final Node<?> node = children.get(i);
+                    if (!oldChildrenData.contains(node.data())) {
+                        final TreeNode<?> treeNode = new TreeNode<>(node, this.tree);
+                        this.insert(treeNode, i);
+                        toSelect = new TreePath(treeNode.getPath());
+                    } else { // discarded nodes should be disposed manually to unregister listeners.
+                        node.dispose();
+                    }
                 }
+            } else {
+                final List<Node<?>> newChildren = children.stream()
+                        .filter(c -> !oldChildrenData.contains(c.data())).collect(Collectors.toList());
+                newChildren.forEach(node -> this.insert(new TreeNode<>(node, this.tree), getChildCount()));
             }
-            if (this.getChildCount() > 0) {
-                this.remove(0);
-            }
+
+            this.removeLoadingNode();
+            this.addLoadMoreNode();
             this.refreshChildrenView();
 //            Optional.ofNullable(toSelect)
 //                .filter(s -> ((DefaultMutableTreeNode) s.getPathComponent(1)).getUserObject() instanceof AzureResources) //  is node in app-centric view.
@@ -235,6 +245,28 @@ public class Tree extends SimpleTree implements DataProvider {
                 this.inner.dispose();
             }
         }
+
+        private void removeLoadingNode() {
+            this.children().asIterator().forEachRemaining(c -> {
+                if (c instanceof LoadingNode) {
+                    ((LoadingNode) c).removeFromParent();
+                }
+            });
+        }
+
+        private void addLoadMoreNode() {
+            if (this.inner.hasMoreChild()) {
+                this.add(new LoadMoreNode(e -> this.inner.triggerLoadMoreAction(e)));
+            }
+        }
+
+        private void removeLoadMoreNode() {
+            this.children().asIterator().forEachRemaining(c -> {
+                if (c instanceof LoadMoreNode) {
+                    ((LoadMoreNode) c).removeFromParent();
+                }
+            });
+        }
     }
 
     public static class NodeRenderer extends com.intellij.ide.util.treeView.NodeRenderer {
@@ -246,6 +278,21 @@ public class Tree extends SimpleTree implements DataProvider {
             } else {
                 super.customizeCellRenderer(tree, value, selected, expanded, leaf, row, hasFocus);
             }
+        }
+    }
+
+    public static class LoadMoreNode extends DefaultMutableTreeNode {
+
+        @Getter
+        private final Consumer<Object> consumer;
+
+        public LoadMoreNode(@Nonnull final Consumer<Object> consumer) {
+            this("Load More", consumer);
+        }
+
+        public LoadMoreNode(@Nonnull final String title, @Nonnull final Consumer<Object> consumer) {
+            super(title);
+            this.consumer = consumer;
         }
     }
 }

@@ -77,9 +77,9 @@ public class CreateKubernetesServiceAction {
         return config;
     }
 
-    @AzureOperation(name = "kubernetes.create_service.service", params = {"config.getName()"}, type = AzureOperation.Type.ACTION)
+    @AzureOperation(name = "kubernetes.create_cluster.cluster", params = {"config.getName()"}, type = AzureOperation.Type.ACTION)
     private static void doCreate(final KubernetesClusterDraft.Config config, final Project project) {
-        final AzureString title = OperationBundle.description("kubernetes.create_service.service", config.getName());
+        final AzureString title = OperationBundle.description("kubernetes.create_cluster.cluster", config.getName());
         AzureTaskManager.getInstance().runInBackground(title, () -> {
             final ResourceGroup rg = config.getResourceGroup();
             if (rg.isDraftForCreating()) {

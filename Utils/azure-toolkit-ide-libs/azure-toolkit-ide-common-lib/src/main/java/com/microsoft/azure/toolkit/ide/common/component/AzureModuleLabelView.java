@@ -37,7 +37,7 @@ public class AzureModuleLabelView<T extends AzResourceModule<?>> implements Node
     }
 
     public AzureModuleLabelView(@Nonnull T module, String label) {
-        this(module, label, String.format("/icons/%s/default.svg", module.getFullResourceType()));
+        this(module, label, String.format("/icons/%s/module.svg", module.getFullResourceType()));
     }
 
     public AzureModuleLabelView(@Nonnull T module, String label, String iconPath) {

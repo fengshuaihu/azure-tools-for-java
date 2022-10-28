@@ -16,6 +16,8 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.util.ui.UIUtil;
 import com.microsoft.azure.toolkit.ide.common.store.AzureConfigInitializer;
+import com.microsoft.azure.toolkit.intellij.common.AzureIntegerInput;
+import com.microsoft.azure.toolkit.intellij.common.AzureTextInput;
 import com.microsoft.azure.toolkit.intellij.common.component.AzureFileInput;
 import com.microsoft.azure.toolkit.intellij.connector.Password;
 import com.microsoft.azure.toolkit.lib.Azure;
@@ -38,8 +40,11 @@ import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.microsoft.azure.toolkit.intellij.common.AzureBundle.message;
 import static com.microsoft.azuretools.telemetry.TelemetryConstants.ACCOUNT;
@@ -56,6 +61,8 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
     private FunctionCoreToolsCombobox funcCoreToolsPath;
     private JLabel azureEnvDesc;
     private AzureFileInput txtStorageExplorer;
+    private AzureIntegerInput txtBatchSize;
+    private AzureTextInput txtLabelFields;
 
     private AzureConfiguration originalConfig;
 
@@ -82,6 +89,8 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
                 setText(value.title());
             }
         });
+        txtBatchSize.setMinValue(1);
+
         azureEnvDesc.setForeground(UIUtil.getContextHelpForeground());
         azureEnvDesc.setMaximumSize(new Dimension());
         azureEnvironmentComboBox.addItemListener(e -> {
@@ -129,6 +138,8 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
             txtStorageExplorer.setValue(config.getStorageExplorerPath());
         }
         allowTelemetryCheckBox.setSelected(oldTelemetryEnabled);
+        txtBatchSize.setValue(config.getCosmosBatchSize());
+        txtLabelFields.setValue(config.getDocumentsLabelFields().stream().collect(Collectors.joining(";")));
     }
 
     public AzureConfiguration getData() {
@@ -146,6 +157,13 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
         if (StringUtils.isNotBlank(txtStorageExplorer.getValue())) {
             data.setStorageExplorerPath(txtStorageExplorer.getValue());
         }
+        if (Objects.nonNull(txtBatchSize.getValue())) {
+            data.setCosmosBatchSize(txtBatchSize.getValue());
+        }
+        if (StringUtils.isNotEmpty(txtLabelFields.getValue())) {
+            final List<String> fields = Arrays.stream(txtLabelFields.getValue().split(";")).collect(Collectors.toList());
+            data.setDocumentsLabelFields(fields);
+        }
         return data;
     }
 
@@ -158,7 +176,7 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
                 azureEnvDesc.setIcon(AllIcons.General.Information);
             } else {
                 setTextToLabel(azureEnvDesc,
-                    String.format("You are currently signed in to environment: %s, your change will sign out your account.", currentEnvStr));
+                        String.format("You are currently signed in to environment: %s, your change will sign out your account.", currentEnvStr));
                 azureEnvDesc.setIcon(AllIcons.General.Warning);
             }
         } else {
@@ -207,9 +225,11 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
         this.originalConfig.setDatabasePasswordSaveType(newConfig.getDatabasePasswordSaveType());
         this.originalConfig.setFunctionCoreToolsPath(newConfig.getFunctionCoreToolsPath());
         final String userAgent = String.format(AzurePlugin.USER_AGENT, AzurePlugin.PLUGIN_VERSION,
-            this.originalConfig.getTelemetryEnabled() ? this.originalConfig.getMachineId() : StringUtils.EMPTY);
+                this.originalConfig.getTelemetryEnabled() ? this.originalConfig.getMachineId() : StringUtils.EMPTY);
         this.originalConfig.setUserAgent(userAgent);
         this.originalConfig.setStorageExplorerPath(newConfig.getStorageExplorerPath());
+        this.originalConfig.setCosmosBatchSize(newConfig.getCosmosBatchSize());
+        this.originalConfig.setDocumentsLabelFields(newConfig.getDocumentsLabelFields());
         CommonSettings.setUserAgent(newConfig.getUserAgent());
 
         if (StringUtils.isNotBlank(newConfig.getCloud())) {
@@ -246,7 +266,9 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
                 !StringUtils.equalsIgnoreCase(newConfig.getDatabasePasswordSaveType(), originalConfig.getDatabasePasswordSaveType()) ||
                 !StringUtils.equalsIgnoreCase(newConfig.getFunctionCoreToolsPath(), originalConfig.getFunctionCoreToolsPath()) ||
                 !StringUtils.equalsIgnoreCase(newConfig.getStorageExplorerPath(), originalConfig.getStorageExplorerPath()) ||
-                !Objects.equals(newConfig.getTelemetryEnabled(), newConfig.getTelemetryEnabled());
+                !Objects.equals(newConfig.getTelemetryEnabled(), newConfig.getTelemetryEnabled()) ||
+                !Objects.equals(newConfig.getCosmosBatchSize(), originalConfig.getCosmosBatchSize()) ||
+                !Objects.equals(newConfig.getDocumentsLabelFields(), originalConfig.getDocumentsLabelFields());
     }
 
     @Override

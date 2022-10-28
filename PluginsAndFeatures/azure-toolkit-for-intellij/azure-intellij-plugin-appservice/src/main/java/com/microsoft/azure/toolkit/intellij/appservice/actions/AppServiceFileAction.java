@@ -4,12 +4,14 @@
  */
 package com.microsoft.azure.toolkit.intellij.appservice.actions;
 
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
 import com.microsoft.azure.toolkit.intellij.common.FileChooser;
@@ -36,9 +38,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 // todo: Clean up duplicate codes in UIHelper and IDEHelper
 public class AppServiceFileAction {
@@ -58,12 +61,9 @@ public class AppServiceFileAction {
     )
     @SneakyThrows
     public void openAppServiceFile(AppServiceFile target, Object context) {
-        final Action<Void> retry = Action.retryFromFailure((() -> this.openAppServiceFile(target, context)));
         final AppServiceAppBase<?, ?, ?> appService = target.getApp();
-        final FileEditorManager fileEditorManager = FileEditorManager.getInstance((Project) context);
-        final VirtualFile virtualFile = VirtualFileActions.getOrCreateVirtualFile(target.getId(), target.getFullName(), fileEditorManager);
-        final OutputStream output = virtualFile.getOutputStream(null);
-        final AzureString title = OperationBundle.description("appservice.open_file.file", virtualFile.getName());
+        final FileEditorManager manager = FileEditorManager.getInstance((Project) context);
+        final AzureString title = OperationBundle.description("appservice.open_file.file", target.getName());
         final AzureTask<Void> task = new AzureTask<>(null, title, false, () -> {
             final ProgressIndicator indicator = ProgressManager.getInstance().getProgressIndicator();
             indicator.setIndeterminate(true);
@@ -75,33 +75,57 @@ public class AppServiceFileAction {
                 return;
             }
             indicator.setText2("Loading file content");
-            final String failure = String.format("Can not open file (%s). Try downloading it first and open it manually.", virtualFile.getName());
+            final String failure = String.format("Can not open file (%s). Try downloading it first and open it manually.", target.getName());
             if (target.getSize() > 10 * FileUtils.ONE_MB) {
                 AzureTaskManager.getInstance().runLater(() -> Messages.showWarningDialog(failure, "Open File"));
                 return;
             }
-            appService
-                .getFileContent(file.getPath())
-                .doOnComplete(() -> AzureTaskManager.getInstance().runLater(() -> {
-                    final Consumer<String> contentSaver = content -> saveFileToAzure(target, content, fileEditorManager.getProject());
-                    if (!VirtualFileActions.openFileInEditor(contentSaver, virtualFile, fileEditorManager)) {
-                        Messages.showWarningDialog(failure, "Open File");
-                    }
-                }, AzureTask.Modality.NONE))
-                .doAfterTerminate(() -> IOUtils.closeQuietly(output, null))
-                .subscribe(bytes -> {
-                    try {
-                        if (bytes != null) {
-                            output.write(bytes.array(), 0, bytes.limit());
-                        }
-                    } catch (final IOException e) {
-                        final String error = "failed to load data into editor";
-                        final String action = "try later or downloading it first";
-                        throw new AzureToolkitRuntimeException(error, e, action, retry);
-                    }
-                }, AppServiceFileAction::onRxException);
+            final VirtualFile vf = VirtualFileActions.getVirtualFile(file.getId(), manager);
+            if (Objects.nonNull(vf)) {
+                AzureTaskManager.getInstance().runLater(() -> manager.openFile(vf, true));
+            } else {
+                downloadAndOpen(file, manager.getProject());
+            }
         });
         AzureTaskManager.getInstance().runInModal(task);
+    }
+
+    @SneakyThrows
+    private void downloadAndOpen(AppServiceFile file, Object context) {
+        final FileEditorManager fileEditorManager = FileEditorManager.getInstance((Project) context);
+        final File temp = FileUtil.createTempFile("", file.getName(), true);
+        final FileOutputStream output = new FileOutputStream(temp);
+        final Function<String, Boolean> onSave = content -> {
+            saveFileToAzure(file, content, fileEditorManager.getProject());
+            return true;
+        };
+        final Runnable onClose = () -> {
+            if (Path.of(file.getPath()).toString().contains(Path.of(FileUtil.getTempDirectory()).toString())) {
+                WriteAction.run(() -> FileUtil.delete(temp));
+            }
+        };
+        file.getApp()
+            .getFileContent(file.getPath())
+            .doOnComplete(() -> AzureTaskManager.getInstance().runLater(() -> {
+                final VirtualFile virtualFile = VirtualFileActions.createVirtualFile(file.getId(), file.getFullName(), temp, fileEditorManager);
+                if (!VirtualFileActions.openFileInEditor(virtualFile, onSave, onClose, fileEditorManager)) {
+                    final String failure = String.format("Can not open file (%s). Try downloading it first and open it manually.", file.getName());
+                    Messages.showWarningDialog(failure, "Open File");
+                }
+            }, AzureTask.Modality.NONE))
+            .doAfterTerminate(() -> IOUtils.closeQuietly(output, null))
+            .subscribe(bytes -> {
+                try {
+                    if (bytes != null) {
+                        output.write(bytes.array(), 0, bytes.limit());
+                    }
+                } catch (final IOException e) {
+                    final String error = "failed to load data into editor";
+                    final String action = "try later or downloading it first";
+                    final Action<Void> retry = Action.retryFromFailure((() -> this.openAppServiceFile(file, context)));
+                    throw new AzureToolkitRuntimeException(error, e, action, retry);
+                }
+            }, AppServiceFileAction::onRxException);
     }
 
     @AzureOperation(
@@ -124,7 +148,7 @@ public class AppServiceFileAction {
             }
             if (toSave) {
                 appService.uploadFileToPath(content, appServiceFile.getPath());
-                AzureMessager.getMessager().info(String.format(FILE_HAS_BEEN_SAVED, appServiceFile.getName()), APP_SERVICE_FILE_EDITING);
+                AzureMessager.getMessager().success(AzureString.format(FILE_HAS_BEEN_SAVED, appServiceFile.getName()), APP_SERVICE_FILE_EDITING);
             }
         }));
     }

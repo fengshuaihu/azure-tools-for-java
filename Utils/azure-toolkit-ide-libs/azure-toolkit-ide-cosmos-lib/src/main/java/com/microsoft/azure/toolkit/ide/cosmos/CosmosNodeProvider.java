@@ -26,9 +26,11 @@ import com.microsoft.azure.toolkit.lib.cosmos.model.DatabaseAccountKind;
 import com.microsoft.azure.toolkit.lib.cosmos.mongo.MongoCollection;
 import com.microsoft.azure.toolkit.lib.cosmos.mongo.MongoCosmosDBAccount;
 import com.microsoft.azure.toolkit.lib.cosmos.mongo.MongoDatabase;
+import com.microsoft.azure.toolkit.lib.cosmos.mongo.MongoDocument;
 import com.microsoft.azure.toolkit.lib.cosmos.sql.SqlContainer;
 import com.microsoft.azure.toolkit.lib.cosmos.sql.SqlCosmosDBAccount;
 import com.microsoft.azure.toolkit.lib.cosmos.sql.SqlDatabase;
+import com.microsoft.azure.toolkit.lib.cosmos.sql.SqlDocument;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -38,6 +40,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.microsoft.azure.toolkit.ide.common.component.AzureResourceIconProvider.DEFAULT_AZURE_RESOURCE_ICON_PROVIDER;
 
 public class CosmosNodeProvider implements IExplorerNodeProvider {
 
@@ -53,7 +57,8 @@ public class CosmosNodeProvider implements IExplorerNodeProvider {
     @Override
     public boolean accept(@Nonnull Object data, @Nullable Node<?> parent, ViewType type) {
         return data instanceof AzureCosmosService || data instanceof CosmosDBAccount || data instanceof MongoDatabase || data instanceof MongoCollection ||
-                data instanceof CassandraKeyspace || data instanceof CassandraTable || data instanceof SqlDatabase || data instanceof SqlContainer;
+                data instanceof CassandraKeyspace || data instanceof CassandraTable || data instanceof SqlDatabase || data instanceof SqlContainer ||
+                data instanceof SqlDocument || data instanceof MongoDocument;
     }
 
     @Nullable
@@ -107,7 +112,13 @@ public class CosmosNodeProvider implements IExplorerNodeProvider {
             return new Node<>(table)
                     .view(new AzureResourceLabelView<>(table))
                     .inlineAction(ResourceCommonActionsContributor.PIN)
-                    .actions(CosmosActionsContributor.MONGO_COLLECTION_ACTIONS);
+                    .actions(CosmosActionsContributor.MONGO_COLLECTION_ACTIONS)
+                    .addChildren(collection -> collection.getDocumentModule().list(), (document, collectionNode) -> this.createNode(document, collectionNode, manager))
+                    .newItemsOrder(Node.Order.INSERT_ORDER)
+                    .loadMoreAction(CosmosActionsContributor.LOAD_MODE_DOCUMENT)
+                    .hasMorePredicate(container -> container.getDocumentModule().hasMoreDocuments());
+//                    .addChildren(module -> module.getDocumentModule().hasMoreDocuments() ? Arrays.asList(module.getDocumentModule()) : Collections.emptyList(),
+//                            (module, containerNode)-> this.createLoadMore(module, containerNode, manager));
         } else if (data instanceof SqlDatabase) {
             final SqlDatabase sqlDatabase = (SqlDatabase) data;
             return new Node<>(sqlDatabase)
@@ -121,14 +132,18 @@ public class CosmosNodeProvider implements IExplorerNodeProvider {
                     .view(new AzureResourceLabelView<>(table))
                     .inlineAction(ResourceCommonActionsContributor.PIN)
                     .actions(CosmosActionsContributor.SQL_CONTAINER_ACTIONS)
-                    .doubleClickAction(ResourceCommonActionsContributor.OPEN_PORTAL_URL);
+                    .addChildren(container -> container.getDocumentModule().list(), (document, containerNode) -> this.createNode(document, containerNode, manager))
+                    .newItemsOrder(Node.Order.INSERT_ORDER)
+                    .loadMoreAction(CosmosActionsContributor.LOAD_MODE_DOCUMENT)
+                    .hasMorePredicate(container -> container.getDocumentModule().hasMoreDocuments());
+//                    .addChildren(module -> module.getDocumentModule().hasMoreDocuments() ? Arrays.asList(module.getDocumentModule()) : Collections.emptyList(),
+//                            (module, containerNode)-> this.createLoadMore(module, containerNode, manager));
         } else if (data instanceof CassandraKeyspace) {
             final CassandraKeyspace cassandraKeyspace = (CassandraKeyspace) data;
             return new Node<>(cassandraKeyspace)
                     .view(new AzureResourceLabelView<>(cassandraKeyspace))
                     .inlineAction(ResourceCommonActionsContributor.PIN)
                     .actions(CosmosActionsContributor.CASSANDRA_KEYSPACE_ACTIONS)
-                    .doubleClickAction(ResourceCommonActionsContributor.OPEN_PORTAL_URL)
                     .addChildren(keyspace -> keyspace.tables().list(), (table, keyspaceNode) -> this.createNode(table, keyspaceNode, manager));
         } else if (data instanceof CassandraTable) {
             final CassandraTable table = (CassandraTable) data;
@@ -137,9 +152,30 @@ public class CosmosNodeProvider implements IExplorerNodeProvider {
                     .inlineAction(ResourceCommonActionsContributor.PIN)
                     .actions(CosmosActionsContributor.CASSANDRA_TABLE_ACTIONS)
                     .doubleClickAction(ResourceCommonActionsContributor.OPEN_PORTAL_URL);
+        } else if (data instanceof MongoDocument) {
+            final MongoDocument document = (MongoDocument) data;
+            return new Node<>(document)
+                    .view(new AzureResourceLabelView<>(document, MongoDocument::getDocumentDisplayName,
+                            doc -> StringUtils.isEmpty(doc.getSharedKey()) ? "None" : doc.getSharedKey(), DEFAULT_AZURE_RESOURCE_ICON_PROVIDER))
+                    .actions(CosmosActionsContributor.COSMOS_DOCUMENT_ACTIONS)
+                    .doubleClickAction(CosmosActionsContributor.OPEN_DOCUMENT);
+        } else if (data instanceof SqlDocument) {
+            final SqlDocument document = (SqlDocument) data;
+            return new Node<>(document)
+                    .view(new AzureResourceLabelView<>(document, SqlDocument::getDocumentDisplayName,
+                            doc -> StringUtils.isEmpty(doc.getDocumentPartitionKey()) ? "None" : doc.getDocumentPartitionKey(), DEFAULT_AZURE_RESOURCE_ICON_PROVIDER))
+                    .actions(CosmosActionsContributor.COSMOS_DOCUMENT_ACTIONS)
+                    .doubleClickAction(CosmosActionsContributor.OPEN_DOCUMENT);
         }
         return null;
     }
+
+//    private <T extends ICosmosDocument> Node<?> createLoadMore(ICosmosDocumentModule<? extends T> module, Node<? extends ICosmosDocumentContainer<T>> containerNode, Manager manager) {
+//        return new Node<>(module)
+//                .view(new NodeView.Static("Load More", AzureIcons.Action.REFRESH.getIconPath()))
+//                .clickAction(CosmosActionsContributor.LOAD_MODE_DOCUMENT)
+//                .doubleClickAction(CosmosActionsContributor.LOAD_MODE_DOCUMENT);
+//    }
 
     static class AzureCosmosServiceLabelView extends AzureServiceLabelView<AzureCosmosService> {
 

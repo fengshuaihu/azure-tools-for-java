@@ -6,20 +6,17 @@
 package com.microsoft.azure.toolkit.intellij.legacy.webapp;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionToolbarPosition;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.AnActionButton;
 import com.intellij.ui.HideableDecorator;
 import com.intellij.ui.HyperlinkLabel;
-import com.intellij.ui.ToolbarDecorator;
-import com.intellij.ui.table.JBTable;
 import com.microsoft.azure.toolkit.intellij.common.BaseEditor;
+import com.microsoft.azure.toolkit.intellij.legacy.appservice.table.AppSettingsTable;
+import com.microsoft.azure.toolkit.intellij.legacy.appservice.table.AppSettingsTableUtils;
 import com.microsoft.azure.toolkit.lib.appservice.AppServiceAppBase;
 import com.microsoft.azure.toolkit.lib.appservice.model.OperatingSystem;
 import com.microsoft.azure.toolkit.lib.common.event.AzureEvent;
@@ -38,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -49,14 +45,8 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
     protected final WebAppBasePropertyViewPresenter<WebAppBasePropertyMvpView> presenter;
     private final Map<String, String> cachedAppSettings;
     private final Map<String, String> editedAppSettings;
-
     private static final String PNL_OVERVIEW = "Overview";
     private static final String PNL_APP_SETTING = "App Settings";
-    private static final String BUTTON_EDIT = "Edit";
-    private static final String BUTTON_REMOVE = "Remove";
-    private static final String BUTTON_ADD = "Add";
-    private static final String TABLE_HEADER_VALUE = "Value";
-    private static final String TABLE_HEADER_KEY = "Key";
     private static final String TXT_NA = "N/A";
     private static final String TABLE_LOADING_MESSAGE = "Loading ... ";
     private static final String TABLE_EMPTY_MESSAGE = "No available settings.";
@@ -65,7 +55,6 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
     private static final String NOTIFY_PROFILE_GET_SUCCESS = "Publish Profile saved.";
     private static final String NOTIFY_PROFILE_GET_FAIL = "Failed to get Publish Profile.";
     private static final String INSIGHT_NAME = "AzurePlugin.IntelliJ.Editor.WebAppBasePropertyView";
-
     private JPanel pnlMain;
     private JButton btnGetPublishFile;
     private JButton btnSave;
@@ -85,12 +74,7 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
     private JTextField txtContainer;
     private JLabel lblJavaVersion;
     private JLabel lblContainer;
-    private JBTable tblAppSetting;
-    private DefaultTableModel tableModel;
-    private AnActionButton btnAdd;
-    private AnActionButton btnRemove;
-    private AnActionButton btnEdit;
-
+    private AppSettingsTable tblAppSetting;
     protected String subscriptionId;
     protected String resourceId;
     protected String appServiceId;
@@ -155,11 +139,8 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
             @Override
             public void actionPerformedFunc(ActionEvent event) {
                 updateMapStatus(editedAppSettings, cachedAppSettings);
-                tableModel.getDataVector().removeAllElements();
-                for (final String key : editedAppSettings.keySet()) {
-                    tableModel.addRow(new String[]{key, editedAppSettings.get(key)});
-                }
-                tableModel.fireTableDataChanged();
+                tblAppSetting.clear();
+                tblAppSetting.addAppSettings(editedAppSettings);
             }
         });
 
@@ -231,85 +212,36 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
     }
 
     private void createUIComponents() {
-        tableModel = new DefaultTableModel();
-        tableModel.addColumn(TABLE_HEADER_KEY);
-        tableModel.addColumn(TABLE_HEADER_VALUE);
-
-        tblAppSetting = new JBTable(tableModel);
+        tblAppSetting = new AppSettingsTable();
         tblAppSetting.setRowSelectionAllowed(true);
         tblAppSetting.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblAppSetting.getEmptyText().setText(TABLE_LOADING_MESSAGE);
-
-        tblAppSetting.addPropertyChangeListener(evt -> {
-            if ("tableCellEditor".equals(evt.getPropertyName())) {
-                if (!tblAppSetting.isEditing()) {
-                    editedAppSettings.clear();
-                    int row = 0;
-                    while (row < tableModel.getRowCount()) {
-                        final Object keyObj = tableModel.getValueAt(row, 0);
-                        String key = "";
-                        String value = "";
-                        if (keyObj != null) {
-                            key = (String) keyObj;
-                        }
-                        if (key.isEmpty() || editedAppSettings.containsKey(key)) {
-                            tableModel.removeRow(row);
-                            continue;
-                        }
-                        final Object valueObj = tableModel.getValueAt(row, 1);
-                        if (valueObj != null) {
-                            value = (String) valueObj;
-                        }
-                        editedAppSettings.put(key, value);
-                        ++row;
+        tblAppSetting.getModel().addTableModelListener(e -> {
+            if (!tblAppSetting.isEditing() && !tblAppSetting.isLoading()) {
+                editedAppSettings.clear();
+                int row = 0;
+                while (row < tblAppSetting.getModel().getRowCount()) {
+                    final Object keyObj = tblAppSetting.getModel().getValueAt(row, 0);
+                    String key = "";
+                    String value = "";
+                    if (keyObj != null) {
+                        key = (String) keyObj;
                     }
-                    updateSaveAndDiscardBtnStatus();
-                    updateTableActionBtnStatus(false);
-                } else {
-                    updateTableActionBtnStatus(true);
+                    if (key.isEmpty() || editedAppSettings.containsKey(key)) {
+                        tblAppSetting.removeAppSettings(row);
+                        continue;
+                    }
+                    final Object valueObj = tblAppSetting.getModel().getValueAt(row, 1);
+                    if (valueObj != null) {
+                        value = (String) valueObj;
+                    }
+                    editedAppSettings.put(key, value);
+                    ++row;
                 }
-            }
-        });
-
-        btnAdd = new AnActionButton(BUTTON_ADD, AllIcons.General.Add) {
-            @Override
-            public void actionPerformed(AnActionEvent anActionEvent) {
-                if (tblAppSetting.isEditing()) {
-                    tblAppSetting.getCellEditor().stopCellEditing();
-                }
-                tableModel.addRow(new String[]{"", ""});
-                tblAppSetting.editCellAt(tblAppSetting.getRowCount() - 1, 0);
-            }
-        };
-
-        btnRemove = new AnActionButton(BUTTON_REMOVE, AllIcons.General.Remove) {
-            @Override
-            public void actionPerformed(AnActionEvent anActionEvent) {
-                final int selectedRow = tblAppSetting.getSelectedRow();
-                if (selectedRow == -1) {
-                    return;
-                }
-                editedAppSettings.remove(tableModel.getValueAt(selectedRow, 0));
-                tableModel.removeRow(selectedRow);
                 updateSaveAndDiscardBtnStatus();
             }
-        };
-
-        btnEdit = new AnActionButton(BUTTON_EDIT, AllIcons.Actions.Edit) {
-            @Override
-            public void actionPerformed(AnActionEvent anActionEvent) {
-                final int selectedRow = tblAppSetting.getSelectedRow();
-                final int selectedCol = tblAppSetting.getSelectedColumn();
-                if (selectedRow == -1 || selectedCol == -1) {
-                    return;
-                }
-                tblAppSetting.editCellAt(selectedRow, selectedCol);
-            }
-        };
-
-        final ToolbarDecorator tableToolbarDecorator = ToolbarDecorator.createDecorator(tblAppSetting)
-                .addExtraActions(btnAdd, btnRemove, btnEdit).setToolbarPosition(ActionToolbarPosition.RIGHT);
-        pnlAppSettings = tableToolbarDecorator.createPanel();
+        });
+        pnlAppSettings = AppSettingsTableUtils.createAppSettingPanel(tblAppSetting);
     }
 
     @Override
@@ -357,15 +289,13 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
                     break;
             }
         }
-
-        tableModel.getDataVector().removeAllElements();
         cachedAppSettings.clear();
         tblAppSetting.getEmptyText().setText(TABLE_EMPTY_MESSAGE);
         final Object appSettingsObj = webAppProperty.getValue(WebAppPropertyViewPresenter.KEY_APP_SETTING);
         if (appSettingsObj instanceof Map) {
             final Map<String, String> appSettings = (Map<String, String>) appSettingsObj;
+            tblAppSetting.loadAppSettings(() -> appSettings);
             for (final String key : appSettings.keySet()) {
-                tableModel.addRow(new String[]{key, appSettings.get(key)});
                 cachedAppSettings.put(key, appSettings.get(key));
             }
         }
@@ -402,9 +332,6 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
         this.loading = loading;
         btnSave.setEnabled(!loading);
         btnDiscard.setEnabled(!loading);
-        btnAdd.setEnabled(!loading);
-        btnRemove.setEnabled(!loading);
-        btnEdit.setEnabled(!loading);
         tblAppSetting.setEnabled(!loading);
     }
 
@@ -416,12 +343,6 @@ public abstract class WebAppBasePropertyView extends BaseEditor implements WebAp
             btnDiscard.setEnabled(true);
             btnSave.setEnabled(true);
         }
-    }
-
-    private void updateTableActionBtnStatus(boolean isEditing) {
-        btnAdd.setEnabled(!isEditing);
-        btnRemove.setEnabled(!isEditing);
-        btnEdit.setEnabled(!isEditing);
     }
 
     private void setTextFieldStyle() {

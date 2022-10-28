@@ -51,10 +51,10 @@ public final class AzureIcons {
         public static final AzureIcon LOG = AzureIcon.builder().iconPath("/icons/action/log").build();
         public static final AzureIcon CONSOLE = AzureIcon.builder().iconPath("/icons/action/console").build();
         public static final AzureIcon SFTP = AzureIcon.builder().iconPath("/icons/action/sftp").build();
-        public static final AzureIcon DEBUG = AzureIcon.builder().iconPath("icons/action/debug").build();
-        public static final AzureIcon ATTACH = AzureIcon.builder().iconPath("icons/action/attach").build();
         public static final AzureIcon UPLOAD = AzureIcon.builder().iconPath("/icons/action/upload").build();
         public static final AzureIcon DOWNLOAD = AzureIcon.builder().iconPath("/icons/action/download").build();
+        public static final AzureIcon ATTACH_DEBUGGER = AzureIcon.builder().iconPath("icons/action/attachDebugger").build();
+        public static final AzureIcon REMOTE_DEBUG = AzureIcon.builder().iconPath("icons/action/remoteDebug").build();
     }
 
     public static final class MySQL {

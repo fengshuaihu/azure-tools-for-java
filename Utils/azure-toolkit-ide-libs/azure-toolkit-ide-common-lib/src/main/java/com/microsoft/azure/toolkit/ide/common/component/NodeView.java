@@ -34,7 +34,7 @@ public interface NodeView extends IView.Label {
     }
 
     default String getTips() {
-        return this.getDescription();
+        return Optional.ofNullable(this.getDescription()).filter(StringUtils::isNotBlank).orElseGet(this::getLabel);
     }
 
     void setRefresher(Refresher refresher);

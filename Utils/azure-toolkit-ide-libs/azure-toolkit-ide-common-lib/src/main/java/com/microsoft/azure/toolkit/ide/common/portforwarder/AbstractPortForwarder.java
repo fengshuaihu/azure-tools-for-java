@@ -20,23 +20,22 @@ import java.util.concurrent.CompletableFuture;
 public abstract class AbstractPortForwarder {
     protected ServerSocketChannel server;
 
-    public void startForward(ServerSocketChannel server) {
+    public void initLocalSocket(final int port) throws IOException {
+        stopForward();
+        this.server = ServerSocketChannel.open().bind(new InetSocketAddress(port));
+    }
+
+    public void startForward(final int localPort) {
         try {
-            this.server = server;
+            if (Objects.isNull(this.server)) {
+                initLocalSocket(localPort);
+            }
             final OkHttpClient okHttpClient = new OkHttpClient();
             final PortForwarderWebSocketListener listener = createWebSocketListener(server.accept());
             final CompletableFuture<WebSocket> future = createSocketBuilder(okHttpClient).buildAsync(listener);
             future.whenComplete((socket, throwable) -> Optional.ofNullable(throwable).ifPresent(t -> listener.onError(socket, t)));
         } catch (final IOException e) {
-            throw new AzureToolkitRuntimeException("Unable to start debugging.", e);
-        }
-    }
-
-    public void startForward(final int localPort) {
-        try {
-            final ServerSocketChannel serverSocketChannel = ServerSocketChannel.open().bind(new InetSocketAddress(localPort));
-            startForward(serverSocketChannel);
-        } catch (final IOException e) {
+            stopForward();
             throw new AzureToolkitRuntimeException("Unable to start debugging.", e);
         }
     }

@@ -1,0 +1,31 @@
+webapp.create_app_in_azure.app:
+  actions:
+    - webapp.create_app.app
+  success: 2
+  failure: -3
+function.create_app_in_azure.app:
+  actions:
+    - function.create_app.app
+  success: 2
+  failure: -3
+springcloud.create_app_in_azure.app:
+  actions:
+    - springcloud.create_app.app
+  success: 2
+  failure: -3
+webapp.update_app_in_azure.app:
+  actions:
+    - webapp.deploy_artifact.app
+    - webapp.deploy_module.module
+  success: 3
+  failure: -5
+function.update_app_in_azure.app:
+  actions:
+    - function.deploy_app
+  success: 3
+  failure: -5
+springcloud.update_app_in_azure.app:
+  actions:
+    - springcloud.deploy_app.app
+  success: 3
+  failure: -5

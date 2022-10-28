@@ -75,14 +75,15 @@ public class FunctionAppActionsContributor implements IActionsContributor {
             "---",
             ResourceCommonActionsContributor.DEPLOY,
             "---",
+            FunctionAppActionsContributor.REMOTE_DEBUGGING,
+            FunctionAppActionsContributor.ENABLE_REMOTE_DEBUGGING,
+            FunctionAppActionsContributor.DISABLE_REMOTE_DEBUGGING,
+            "---",
             ResourceCommonActionsContributor.START,
             ResourceCommonActionsContributor.STOP,
             ResourceCommonActionsContributor.RESTART,
             ResourceCommonActionsContributor.DELETE,
             "---",
-            FunctionAppActionsContributor.ENABLE_REMOTE_DEBUGGING,
-            FunctionAppActionsContributor.DISABLE_REMOTE_DEBUGGING,
-            FunctionAppActionsContributor.REMOTE_DEBUGGING,
             AppServiceActionsContributor.START_STREAM_LOG,
             AppServiceActionsContributor.STOP_STREAM_LOG
             // todo: add profile actions like log streaming
@@ -97,14 +98,15 @@ public class FunctionAppActionsContributor implements IActionsContributor {
                 "---",
                 SWAP_DEPLOYMENT_SLOT,
                 "---",
+                FunctionAppActionsContributor.REMOTE_DEBUGGING,
+                FunctionAppActionsContributor.ENABLE_REMOTE_DEBUGGING,
+                FunctionAppActionsContributor.DISABLE_REMOTE_DEBUGGING,
+                "---",
                 ResourceCommonActionsContributor.START,
                 ResourceCommonActionsContributor.STOP,
                 ResourceCommonActionsContributor.RESTART,
                 ResourceCommonActionsContributor.DELETE,
                 "---",
-                FunctionAppActionsContributor.ENABLE_REMOTE_DEBUGGING,
-                FunctionAppActionsContributor.DISABLE_REMOTE_DEBUGGING,
-                FunctionAppActionsContributor.REMOTE_DEBUGGING,
                 AppServiceActionsContributor.START_STREAM_LOG,
                 AppServiceActionsContributor.STOP_STREAM_LOG
         );
@@ -181,8 +183,8 @@ public class FunctionAppActionsContributor implements IActionsContributor {
                 .enabled(s -> s instanceof FunctionAppBase<?, ?, ?> && ((AzResourceBase) s).getFormalStatus().isRunning());
         am.registerAction(DISABLE_REMOTE_DEBUGGING, new Action<>(DISABLE_REMOTE_DEBUGGING, disableRemoteDebuggingView));
 
-        final ActionView.Builder attachDebuggerView = new ActionView.Builder("Attach Debugger", AzureIcons.Action.DEBUG.getIconPath())
-                .title(s -> Optional.ofNullable(s).map(r -> description("function.remote_debugging.app", ((FunctionAppBase<?, ?, ?>) r).getName())).orElse(null))
+        final ActionView.Builder attachDebuggerView = new ActionView.Builder("Attach Debugger", AzureIcons.Action.ATTACH_DEBUGGER.getIconPath())
+                .title(s -> Optional.ofNullable(s).map(r -> description("function.start_remote_debugging.app", ((FunctionAppBase<?, ?, ?>) r).getName())).orElse(null))
                 .enabled(s -> s instanceof FunctionAppBase<?, ?, ?> && ((AzResourceBase) s).getFormalStatus().isRunning());
         am.registerAction(REMOTE_DEBUGGING, new Action<>(REMOTE_DEBUGGING, attachDebuggerView));
     }
