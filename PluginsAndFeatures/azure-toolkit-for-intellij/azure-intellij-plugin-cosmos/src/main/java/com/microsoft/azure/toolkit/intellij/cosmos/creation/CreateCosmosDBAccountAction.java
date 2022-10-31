@@ -4,31 +4,21 @@
  */
 package com.microsoft.azure.toolkit.intellij.cosmos.creation;
 
-import com.google.common.base.Preconditions;
 import com.intellij.openapi.project.Project;
-import com.microsoft.azure.toolkit.lib.auth.AzureAccount;
 import com.microsoft.azure.toolkit.lib.common.bundle.AzureString;
 import com.microsoft.azure.toolkit.lib.common.cache.CacheManager;
-import com.microsoft.azure.toolkit.lib.common.model.AzResource;
-import com.microsoft.azure.toolkit.lib.common.model.Subscription;
 import com.microsoft.azure.toolkit.lib.common.operation.AzureOperation;
 import com.microsoft.azure.toolkit.lib.common.operation.OperationBundle;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
-import com.microsoft.azure.toolkit.lib.common.utils.Utils;
 import com.microsoft.azure.toolkit.lib.cosmos.AzureCosmosService;
 import com.microsoft.azure.toolkit.lib.cosmos.CosmosDBAccount;
 import com.microsoft.azure.toolkit.lib.cosmos.CosmosDBAccountDraft;
 import com.microsoft.azure.toolkit.lib.cosmos.CosmosDBAccountModule;
-import com.microsoft.azure.toolkit.lib.cosmos.model.DatabaseAccountKind;
-import com.microsoft.azure.toolkit.lib.resource.AzureResources;
 import com.microsoft.azure.toolkit.lib.resource.ResourceGroup;
 import com.microsoft.azure.toolkit.lib.resource.task.CreateResourceGroupTask;
-import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.microsoft.azure.toolkit.lib.Azure.az;
 

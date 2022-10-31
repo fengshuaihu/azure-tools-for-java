@@ -56,8 +56,13 @@ public class AzureResourceLabelView<T extends AzResource> implements NodeView {
 
     public AzureResourceLabelView(@Nonnull T resource, @Nonnull Function<T, String> descriptionLoader,
                                   @Nonnull final AzureIconProvider<? super T> iconProvider) {
+        this(resource, AzResource::getName, descriptionLoader, iconProvider);
+    }
+
+    public AzureResourceLabelView(@Nonnull T resource, @Nonnull Function<T, String> labelProvider, @Nonnull Function<T, String> descriptionLoader,
+                                  @Nonnull final AzureIconProvider<? super T> iconProvider) {
         this.resource = resource;
-        this.label = resource.getName();
+        this.label = labelProvider.apply(resource);
         this.iconProvider = iconProvider;
         this.descriptionLoader = descriptionLoader;
         this.listener = new AzureEventBus.EventListener(this::onEvent);
