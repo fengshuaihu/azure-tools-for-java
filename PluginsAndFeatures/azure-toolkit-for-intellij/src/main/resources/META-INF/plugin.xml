@@ -2,7 +2,7 @@
              xmlns:xi="http://www.w3.org/2001/XInclude">
   <id>com.microsoft.tooling.msservices.intellij.azure</id>
   <name>Azure Toolkit for IntelliJ</name>
-  <version>3.70.0-SNAPSHOT</version>
+  <version>3.70.0</version>
   <vendor email="java@microsoft.com" url="http://www.microsoft.com">Microsoft</vendor>
 
   <description><![CDATA[
@@ -208,8 +208,8 @@
               class="com.microsoft.intellij.actions.DisableSslCertificateValidationAction"
               text="Disable"/>
     </group>
-    <action class="com.microsoft.intellij.actions.NewCustomerIssueFeedbackAction" id="AzureToolkit.GithubIssue" text="Report Issues" />
-    <action class="com.microsoft.intellij.actions.NewFeatureRequestFeedbackAction" id="AzureToolkit.FeatureRequest" text="Request Feature" />
+    <action class="com.microsoft.intellij.actions.NewCustomerIssueFeedbackAction" id="AzureToolkit.GithubIssue" text="Report an Issue" />
+    <action class="com.microsoft.intellij.actions.NewFeatureRequestFeedbackAction" id="AzureToolkit.FeatureRequest" text="Request a Feature" />
     <action id="Actions.SparkJobDisconnect" class="com.microsoft.azure.hdinsight.spark.run.action.SparkBatchJobDisconnectAction"
             text="Disconnect" description="Disconnect the log view from remote Spark Job"
             icon="/icons/SparkJobDisconnect.png">
