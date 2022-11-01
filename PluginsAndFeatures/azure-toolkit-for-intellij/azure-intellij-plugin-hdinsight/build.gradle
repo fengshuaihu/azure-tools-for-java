@@ -1,0 +1,11 @@
+intellij {
+}
+
+dependencies {
+    compile project(':azure-intellij-plugin-lib')
+    compile project(':azure-intellij-resource-connector-lib-java')
+    compile 'com.microsoft.azure:azure-toolkit-ide-common-lib'
+    compile 'com.microsoft.azuretools:hdinsight-node-common:3.70.0'
+    compile 'com.microsoft.azuretools:spark-localrun-mock:0.1.1'
+    compile 'com.microsoft.azuretools:azure-explorer-common:3.70.0'
+}
