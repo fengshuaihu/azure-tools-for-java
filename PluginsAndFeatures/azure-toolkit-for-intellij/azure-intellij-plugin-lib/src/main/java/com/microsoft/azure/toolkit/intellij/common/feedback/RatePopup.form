@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.microsoft.azure.toolkit.intellij.common.feedback.RatePopup">
+  <grid id="27dc6" binding="contentPanel" custom-create="true" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="6" left="10" bottom="4" right="6"/>
+    <constraints>
+      <xy x="20" y="20" width="396" height="176"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <vspacer id="5b925">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <component id="4422e" class="javax.swing.JLabel" binding="logo">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="16" height="20"/>
+            <maximum-size width="16" height="20"/>
+          </grid>
+        </constraints>
+        <properties>
+          <horizontalAlignment value="0"/>
+          <icon value="providers/azure.png"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <grid id="d87b4" class="com.intellij.ui.components.panels.NonOpaquePanel" layout-manager="FlowLayout" hgap="4" vgap="1" flow-align="1">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="3f4d8" class="javax.swing.JLabel" binding="star0">
+            <constraints/>
+            <properties>
+              <icon value="nodes/notFavoriteOnHover@2x.png"/>
+              <text value=""/>
+              <toolTipText value="click to send and tell us more."/>
+            </properties>
+          </component>
+          <component id="4ad9e" class="javax.swing.JLabel" binding="star1">
+            <constraints/>
+            <properties>
+              <icon value="nodes/notFavoriteOnHover@2x.png"/>
+              <text value=""/>
+              <toolTipText value="click to send and tell us more."/>
+            </properties>
+          </component>
+          <component id="4d4d6" class="javax.swing.JLabel" binding="star2">
+            <constraints/>
+            <properties>
+              <icon value="nodes/notFavoriteOnHover@2x.png"/>
+              <text value=""/>
+              <toolTipText value="click to send and tell us more."/>
+            </properties>
+          </component>
+          <component id="f1053" class="javax.swing.JLabel" binding="star3">
+            <constraints/>
+            <properties>
+              <icon value="nodes/notFavoriteOnHover@2x.png"/>
+              <text value=""/>
+              <toolTipText value="click to send."/>
+            </properties>
+          </component>
+          <component id="16cae" class="javax.swing.JLabel" binding="star4">
+            <constraints/>
+            <properties>
+              <icon value="nodes/notFavoriteOnHover@2x.png"/>
+              <text value=""/>
+              <toolTipText value="click to send."/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="47b62" class="com.intellij.ui.components.panels.NonOpaquePanel" layout-manager="FlowLayout" hgap="0" vgap="0" flow-align="0">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="10" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="173" height="16"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="e58d9" class="javax.swing.JLabel">
+            <constraints/>
+            <properties>
+              <font size="11"/>
+              <text value="You can also "/>
+            </properties>
+          </component>
+          <component id="b5ffe" class="com.intellij.ui.components.ActionLink" binding="marketplaceLink">
+            <constraints/>
+            <properties>
+              <font size="11"/>
+              <text value="leave review"/>
+            </properties>
+          </component>
+          <component id="a58a9" class="javax.swing.JLabel">
+            <constraints/>
+            <properties>
+              <text value=" in marketplace"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="ae141" class="com.intellij.ui.components.panels.NonOpaquePanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="2" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="6cf23" class="com.intellij.ui.components.ActionLink" binding="notNow">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="10" fill="0" indent="1" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Ask me next time"/>
+            </properties>
+          </component>
+          <grid id="793aa" class="com.intellij.ui.components.panels.NonOpaquePanel" layout-manager="FlowLayout" hgap="0" vgap="0" flow-align="0">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="2" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="6de85" class="com.intellij.ui.components.ActionLink" binding="issueLink">
+                <constraints/>
+                <properties>
+                  <text value="Have an issue"/>
+                </properties>
+              </component>
+              <component id="33801" class="javax.swing.JLabel">
+                <constraints/>
+                <properties>
+                  <text value="/"/>
+                </properties>
+              </component>
+              <component id="e84" class="com.intellij.ui.components.ActionLink" binding="featureLink">
+                <constraints/>
+                <properties>
+                  <text value="feature request"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <component id="8aa81" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font style="1"/>
+          <text value="Are you satisfied with Azure Toolkit for IntelliJ?"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

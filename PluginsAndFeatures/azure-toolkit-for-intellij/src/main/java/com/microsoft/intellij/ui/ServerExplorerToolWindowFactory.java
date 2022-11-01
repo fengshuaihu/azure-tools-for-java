@@ -202,7 +202,8 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
     @Nullable
     private Node getTreeNodeOnMouseClick(JTree tree, TreePath treePath) {
         final Object raw = treePath.getLastPathComponent();
-        if (raw instanceof com.microsoft.azure.toolkit.intellij.common.component.Tree.TreeNode || raw instanceof LoadingNode) {
+        if (raw instanceof com.microsoft.azure.toolkit.intellij.common.component.Tree.TreeNode || raw instanceof LoadingNode ||
+                raw instanceof com.microsoft.azure.toolkit.intellij.common.component.Tree.LoadMoreNode) {
             return null;
         }
         final SortableTreeNode treeNode = (SortableTreeNode) raw;
@@ -382,6 +383,9 @@ public class ServerExplorerToolWindowFactory implements ToolWindowFactory, Prope
                     inlineActionIcon = null;
                 }
                 TreeUtils.renderMyTreeNode(jtree, node, selected, this);
+                return;
+            } else if(value instanceof com.microsoft.azure.toolkit.intellij.common.component.Tree.LoadMoreNode){
+                TreeUtils.renderLoadModeNode(jtree, (com.microsoft.azure.toolkit.intellij.common.component.Tree.LoadMoreNode) value, selected, this);
                 return;
             } else if (value instanceof LoadingNode) {
                 super.customizeCellRenderer(jtree, value, selected, expanded, isLeaf, row, focused);

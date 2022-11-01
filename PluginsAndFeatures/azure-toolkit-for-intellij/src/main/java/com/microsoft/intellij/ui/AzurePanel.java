@@ -89,6 +89,8 @@ public class AzurePanel implements AzureAbstractConfigurablePanel {
                 setText(value.title());
             }
         });
+        txtBatchSize.setMinValue(1);
+
         azureEnvDesc.setForeground(UIUtil.getContextHelpForeground());
         azureEnvDesc.setMaximumSize(new Dimension());
         azureEnvironmentComboBox.addItemListener(e -> {

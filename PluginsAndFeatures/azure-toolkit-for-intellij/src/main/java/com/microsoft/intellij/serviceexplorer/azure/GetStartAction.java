@@ -11,6 +11,8 @@ import com.microsoft.azure.toolkit.ide.common.icon.AzureIcons;
 import com.microsoft.azure.toolkit.ide.common.store.AzureStoreManager;
 import com.microsoft.azure.toolkit.ide.guidance.GuidanceViewManager;
 import com.microsoft.azure.toolkit.ide.guidance.action.ShowGettingStartAction;
+import com.microsoft.azure.toolkit.lib.common.operation.AzureOperation;
+import com.microsoft.azure.toolkit.lib.common.operation.OperationContext;
 import com.microsoft.tooling.msservices.serviceexplorer.NodeAction;
 import com.microsoft.tooling.msservices.serviceexplorer.NodeActionEvent;
 import com.microsoft.tooling.msservices.serviceexplorer.NodeActionListener;
@@ -22,16 +24,20 @@ import java.util.Optional;
 
 public class GetStartAction extends NodeAction {
     private static boolean isActionTriggered = false;
+    private static final String PLACE = "AzureExplorerNode";
 
     public GetStartAction(@Nonnull AzureModule azureModule) {
         super(azureModule, "Getting Started");
         addListener(new NodeActionListener() {
             @Override
+            @AzureOperation(name = "guidance.show_courses_view", type = AzureOperation.Type.ACTION)
             protected void actionPerformed(NodeActionEvent e) {
                 if (!isActionTriggered) {
                     isActionTriggered = true;
                     AzureStoreManager.getInstance().getIdeStore().setProperty(ShowGettingStartAction.GUIDANCE, ShowGettingStartAction.IS_ACTION_TRIGGERED, String.valueOf(true));
                 }
+                OperationContext.action().setTelemetryProperty("FromPlace", PLACE);
+                OperationContext.action().setTelemetryProperty("ShowBlueIcon", String.valueOf(isActionTriggered));
                 GuidanceViewManager.getInstance().showCoursesView((Project) Objects.requireNonNull(azureModule.getProject()));
             }
         });

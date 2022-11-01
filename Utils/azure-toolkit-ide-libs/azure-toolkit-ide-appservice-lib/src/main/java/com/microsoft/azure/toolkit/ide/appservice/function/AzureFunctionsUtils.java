@@ -36,7 +36,7 @@ public class AzureFunctionsUtils {
         return StringUtils.equalsIgnoreCase(triggerType, HTTP_TRIGGER);
     }
 
-    @AzureOperation(name = "function.create_function_project", type = AzureOperation.Type.ACTION)
+    @AzureOperation(name = "function.create_function_project", type = AzureOperation.Type.SERVICE)
     public static void createAzureFunctionProject(String targetPath, String groupId, final String artifactId,
                                                   final String version, final String tool, String[] triggers, String packageName) {
         File tempProjectFolder = null;

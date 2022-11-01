@@ -8,7 +8,6 @@ import com.intellij.ui.components.JBList;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import com.microsoft.azure.toolkit.ide.common.icon.AzureIcons;
 import com.microsoft.azure.toolkit.ide.guidance.GuidanceConfigManager;
 import com.microsoft.azure.toolkit.ide.guidance.config.CourseConfig;
@@ -38,10 +37,12 @@ public class CoursesView {
     private JLabel lblLoading;
     private ActionLink toolkitDocLink;
     private ActionLink newFeatureLink;
+    private JPanel actionLinkPanel;
 
     private final Project project;
 
     private final List<CoursePanel> coursePanels = new ArrayList<>();
+    private final boolean showNewUIFlag = false;
 
     public CoursesView(@Nonnull Project project) {
         this.project = project;
@@ -53,6 +54,7 @@ public class CoursesView {
     private void init() {
         this.lblTitle.setFont(JBFont.h2().asBold());
         this.lblLoading.setIcon(IntelliJAzureIcons.getIcon(AzureIcons.Common.REFRESH_ICON));
+        actionLinkPanel.setVisible(showNewUIFlag);
         AzureTaskManager.getInstance().runInBackgroundAsObservable("Loading lesson", () -> GuidanceConfigManager.getInstance().loadCourses())
                 .subscribeOn(Schedulers.computation())
                 .subscribe(courses -> AzureTaskManager.getInstance().runLater(() -> this.setCourses(courses)));

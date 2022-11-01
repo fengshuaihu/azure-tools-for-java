@@ -60,7 +60,7 @@ public class CreateCosmosContainerAction {
         });
     }
 
-    @AzureOperation(name = "cosmos.create_collection.collection|database", params = {"config.getContainerId()", "database.getName()"}, type = AzureOperation.Type.ACTION)
+    @AzureOperation(name = "cosmos.create_collection.collection|database", params = {"config.getCollectionId()", "database.getName()"}, type = AzureOperation.Type.ACTION)
     private static void doCreateMongoCollection(@Nonnull MongoDatabase database, @Nullable final MongoCollectionDraft.MongoCollectionConfig config) {
         final AzureString title = OperationBundle.description("cosmos.create_collection.collection|database", config.getCollectionId(), database.getName());
         AzureTaskManager.getInstance().runInBackground(title, () -> {

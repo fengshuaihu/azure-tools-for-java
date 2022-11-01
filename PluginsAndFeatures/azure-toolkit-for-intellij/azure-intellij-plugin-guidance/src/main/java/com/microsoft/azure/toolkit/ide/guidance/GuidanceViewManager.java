@@ -46,7 +46,6 @@ public class GuidanceViewManager {
         });
     }
 
-    @AzureOperation(name = "guidance.show_courses_view", type = AzureOperation.Type.ACTION)
     public void showCoursesView(@Nonnull final Project project) {
         final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(GuidanceViewManager.TOOL_WINDOW_ID);
         AzureTaskManager.getInstance().runLater(() -> {

@@ -11,6 +11,7 @@ import com.microsoft.azure.toolkit.lib.common.form.AzureForm;
 import com.microsoft.azure.toolkit.lib.common.form.AzureFormInput;
 import com.microsoft.azure.toolkit.lib.common.form.AzureValidationInfo;
 import com.microsoft.azure.toolkit.lib.cosmos.model.ThroughputConfig;
+import com.microsoft.azure.toolkit.lib.cosmos.mongo.MongoCollection;
 import com.microsoft.azure.toolkit.lib.cosmos.mongo.MongoCollectionDraft;
 import com.microsoft.azure.toolkit.lib.cosmos.mongo.MongoDatabase;
 import org.apache.commons.lang3.ObjectUtils;
@@ -33,10 +34,11 @@ public class CosmosMongoCollectionCreationDialog extends AzureDialog<MongoCollec
     private JLabel lblCollectionId;
 
     private final Project project;
-
+    private final MongoDatabase database;
     public CosmosMongoCollectionCreationDialog(Project project, MongoDatabase database) {
         super(project);
         this.project = project;
+        this.database = database;
         init();
     }
 
@@ -45,6 +47,7 @@ public class CosmosMongoCollectionCreationDialog extends AzureDialog<MongoCollec
         super.init();
         txtCollectionId.setRequired(true);
         txtCollectionId.addValidator(this::validateCollectionId);
+        txtShardKey.addValidator(this::validateSharedKey);
         pnlThroughput.setVisible(chkDedicatedThroughput.isSelected());
         chkDedicatedThroughput.addItemListener(e -> pnlThroughput.setVisible(chkDedicatedThroughput.isSelected()));
 
@@ -60,9 +63,28 @@ public class CosmosMongoCollectionCreationDialog extends AzureDialog<MongoCollec
 
     private AzureValidationInfo validateCollectionId() {
         final String value = txtCollectionId.getValue();
-        return StringUtils.endsWith(value, StringUtils.SPACE) || StringUtils.containsAny(value, "\\", "/", "#", "?", "%") ?
-                AzureValidationInfo.error("Collection Id should not end with space nor contain characters '\\', '/', '#', '?', '%'", txtCollectionId) :
-                AzureValidationInfo.success(txtCollectionId);
+        if (StringUtils.endsWith(value, StringUtils.SPACE) || StringUtils.containsAny(value, "\\", "/", "#", "?", "%", "$", "&")) {
+            return AzureValidationInfo.error("Collection Id should not end with space nor contain characters '\\', '/', '#', '?', '%', '$', '&'", txtCollectionId);
+        }
+        if (StringUtils.startsWith(value, "system.")) {
+            return AzureValidationInfo.error("Collection Id should not begin with 'system.' prefix", txtCollectionId);
+        }
+        final MongoCollection mongoCollection = database.collections().get(value, database.getResourceGroupName());
+        if (mongoCollection != null) {
+            return AzureValidationInfo.error("Collection with same id already exists", txtCollectionId);
+        }
+        return AzureValidationInfo.success(txtCollectionId);
+    }
+
+    private AzureValidationInfo validateSharedKey() {
+        final String value = txtCollectionId.getValue();
+        if (StringUtils.containsAny(value, ".", "$")) {
+            return AzureValidationInfo.error("Shared key should not contain characters '.', '$'", txtCollectionId);
+        }
+        if (StringUtils.contains(value, "null")) {
+            return AzureValidationInfo.error("Shared key should not contain 'null'", txtCollectionId);
+        }
+        return AzureValidationInfo.success(txtCollectionId);
     }
 
     @Override

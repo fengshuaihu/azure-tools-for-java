@@ -10,7 +10,6 @@ import com.microsoft.azure.toolkit.ide.guidance.GuidanceViewManager;
 import com.microsoft.azure.toolkit.ide.guidance.action.ShowGettingStartAction;
 import com.microsoft.azure.toolkit.ide.guidance.config.CourseConfig;
 import com.microsoft.azure.toolkit.lib.common.operation.AzureOperation;
-import com.microsoft.azure.toolkit.lib.common.utils.InstallationIdUtils;
 import lombok.Getter;
 
 import javax.annotation.Nonnull;
@@ -34,7 +33,7 @@ public class CoursePanel {
 
     private final Project project;
     private boolean isStartedActionTriggered;
-    private final boolean showNewUIFlag;
+    private final boolean showNewUIFlag = false;
     public static final JBColor NOTIFICATION_BACKGROUND_COLOR =
             JBColor.namedColor("StatusBar.hoverBackground", new JBColor(15595004, 4606541));
 
@@ -42,7 +41,6 @@ public class CoursePanel {
         super();
         this.course = course;
         this.project = project;
-        this.showNewUIFlag = Integer.parseInt(InstallationIdUtils.getHashMac(), 0, 1, 16) % 2 == 0;
         $$$setupUI$$$();
         init();
     }

@@ -153,10 +153,6 @@ public class AppSettingsTable extends JBTable {
         return appSettingModel.getAppSettings();
     }
 
-    public boolean isEmpty() {
-        return appSettingModel.getRowCount() == 0;
-    }
-
     private void scrollToRow(int target) {
         scrollRectToVisible(getCellRect(target, 0, true));
     }

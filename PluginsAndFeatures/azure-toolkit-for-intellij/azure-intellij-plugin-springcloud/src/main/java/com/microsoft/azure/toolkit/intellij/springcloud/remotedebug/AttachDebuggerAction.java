@@ -43,7 +43,7 @@ public class AttachDebuggerAction {
     private static final int DEFAULT_PORT = 5005;
     private static final String NO_AVAILABLE_INSTANCES = "No available instances in current app %s.";
 
-    @AzureOperation(name = "springcloud.remote_debug.instance", params = {"appInstance.getName()"}, type = AzureOperation.Type.ACTION)
+    @AzureOperation(name = "springcloud.start_remote_debugging.instance", params = {"appInstance.getName()"}, type = AzureOperation.Type.ACTION)
     public static void startDebugging(@Nonnull SpringCloudAppInstance appInstance, Project project) {
         if (!appInstance.getParent().isRemoteDebuggingEnabled()) {
             showEnableDebuggingMessage(appInstance);
@@ -54,7 +54,7 @@ public class AttachDebuggerAction {
         showOpenUrlMessage(appInstance);
     }
 
-    @AzureOperation(name = "springcloud.remote_debug.app", params = {"app.getName()"}, type = AzureOperation.Type.ACTION)
+    @AzureOperation(name = "springcloud.start_remote_debugging.app", params = {"app.getName()"}, type = AzureOperation.Type.ACTION)
     public static void startDebuggingApp(@Nonnull SpringCloudApp app, Project project) {
         final SpringCloudDeployment deployment = app.getActiveDeployment();
         final List<SpringCloudAppInstance> instances = deployment.getInstances();

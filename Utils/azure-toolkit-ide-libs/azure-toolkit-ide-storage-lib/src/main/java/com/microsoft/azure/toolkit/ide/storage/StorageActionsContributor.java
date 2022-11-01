@@ -213,7 +213,6 @@ public class StorageActionsContributor implements IActionsContributor {
             StorageActionsContributor.CREATE_DIRECTORY,
             "---",
             StorageActionsContributor.DOWNLOAD_FILE,
-            StorageActionsContributor.UPLOAD_FILE,
             "---",
             StorageActionsContributor.COPY_FILE_URL,
             StorageActionsContributor.COPY_FILE_SAS_URL,

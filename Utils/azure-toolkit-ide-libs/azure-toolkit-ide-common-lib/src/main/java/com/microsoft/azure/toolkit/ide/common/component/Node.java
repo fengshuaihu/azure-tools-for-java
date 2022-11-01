@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,8 +46,14 @@ public class Node<D> {
     @Nullable
     private IActionGroup actions;
     private int order;
+    @Getter
+    private Order newItemOrder = Order.LIST_ORDER;
+    private Action<? super D> clickAction;
     private Action<? super D> doubleClickAction;
     private Action<? super D> inlineAction;
+    private Action<? super D> loadMoreAction;
+    // by default, we will load all children, so return false for has more child
+    private Predicate<? super D> hasMoreChildrenPredicate = ignore -> false;
 
     public Node(@Nonnull D data) {
         this(data, null);
@@ -102,6 +109,41 @@ public class Node<D> {
         return !this.childrenBuilders.isEmpty();
     }
 
+    public boolean hasMoreChild() {
+        return this.hasMoreChildrenPredicate.test(this.data);
+    }
+
+    public Node<D> hasMorePredicate(Predicate<? super D> predicate) {
+        this.hasMoreChildrenPredicate = predicate;
+        return this;
+    }
+
+    public void triggerLoadMoreAction(final Object event) {
+        if (this.loadMoreAction != null) {
+            this.loadMoreAction.handle(this.data, event);
+        }
+    }
+
+    public Node<D> loadMoreAction(Action.Id<? super D> actionId) {
+        this.loadMoreAction = AzureActionManager.getInstance().getAction(actionId);
+        return this;
+    }
+
+    public boolean hasClickAction() {
+        return this.clickAction != null;
+    }
+
+    public void triggerClickAction(final Object event) {
+        if (this.clickAction != null) {
+            this.clickAction.handle(this.data, event);
+        }
+    }
+
+    public Node<D> clickAction(Action.Id<? super D> actionId) {
+        this.clickAction = AzureActionManager.getInstance().getAction(actionId);
+        return this;
+    }
+
     public void triggerDoubleClickAction(final Object event) {
         if (this.doubleClickAction != null) {
             this.doubleClickAction.handle(this.data, event);
@@ -133,6 +175,11 @@ public class Node<D> {
         return this;
     }
 
+    public Node<D> newItemsOrder(@Nonnull final Order order) {
+        this.newItemOrder = order;
+        return this;
+    }
+
     public void dispose() {
         this.view.dispose();
     }
@@ -146,5 +193,10 @@ public class Node<D> {
             final val childrenData = this.getChildrenData.apply(n.data);
             return childrenData.stream().map(d -> buildChildNode.apply(d, n)).collect(Collectors.toList());
         }
+    }
+
+    public enum Order {
+        LIST_ORDER,
+        INSERT_ORDER
     }
 }

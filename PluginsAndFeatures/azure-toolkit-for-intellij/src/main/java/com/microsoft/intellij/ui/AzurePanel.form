@@ -171,7 +171,7 @@
           <horizontalTextPosition value="2"/>
           <icon value="general/contextHelp.png"/>
           <text value="Documents Batch Size:"/>
-          <toolTipText value="The batch size to be used when querying Azure Database resources. 50 "/>
+          <toolTipText value="The batch size to be used when querying Azure Database resources. "/>
         </properties>
       </component>
       <component id="7678f" class="javax.swing.JLabel">
@@ -182,7 +182,7 @@
           <horizontalTextPosition value="2"/>
           <icon value="general/contextHelp.png"/>
           <text value="Documents Label Fields:"/>
-          <toolTipText value="The field values to display as labels in the treeview for Cosmos DB and MongoDB documents, in priority order, split by semicolon"/>
+          <toolTipText value="The field values to display as labels in the treeview for Cosmos DB and MongoDB documents, in priority order, separated by ';'."/>
         </properties>
       </component>
       <component id="b0d11" class="com.microsoft.azure.toolkit.intellij.common.AzureTextInput" binding="txtLabelFields">

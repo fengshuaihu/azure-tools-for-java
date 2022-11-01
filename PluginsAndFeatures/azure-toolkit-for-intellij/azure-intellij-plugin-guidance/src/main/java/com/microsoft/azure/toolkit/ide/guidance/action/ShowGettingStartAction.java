@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.microsoft.azure.toolkit.ide.common.store.AzureStoreManager;
 import com.microsoft.azure.toolkit.ide.guidance.GuidanceViewManager;
 import com.microsoft.azure.toolkit.intellij.common.IntelliJAzureIcons;
+import com.microsoft.azure.toolkit.lib.common.operation.AzureOperation;
+import com.microsoft.azure.toolkit.lib.common.operation.OperationContext;
 import com.microsoft.azuretools.telemetrywrapper.Operation;
 import com.microsoft.intellij.AzureAnAction;
 import org.jetbrains.annotations.NotNull;
@@ -19,12 +21,15 @@ public class ShowGettingStartAction extends AzureAnAction {
     private static boolean isActionTriggered = false;
 
     @Override
+    @AzureOperation(name = "guidance.show_courses_view", type = AzureOperation.Type.ACTION)
     public boolean onActionPerformed(@NotNull AnActionEvent anActionEvent, @Nullable Operation operation) {
         if (anActionEvent.getProject() != null) {
             if (!isActionTriggered) {
                 isActionTriggered = true;
                 AzureStoreManager.getInstance().getIdeStore().setProperty(GUIDANCE, IS_ACTION_TRIGGERED, String.valueOf(true));
             }
+            OperationContext.action().setTelemetryProperty("FromPlace", anActionEvent.getPlace());
+            OperationContext.action().setTelemetryProperty("ShowBlueIcon", String.valueOf(isActionTriggered));
             GuidanceViewManager.getInstance().showCoursesView(anActionEvent.getProject());
         }
         return true;

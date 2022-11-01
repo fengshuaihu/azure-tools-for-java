@@ -84,7 +84,9 @@ public class PortForwardingTaskProvider extends BeforeRunTaskProvider<PortForwar
         }
 
         public boolean startPortForwarding(int localPort) {
-            if (this.config instanceof RemoteConfiguration) {
+            final String resourceId = this.state.properties.get(PortForwarderBeforeRunTaskState.RESOURCE_ID);
+            this.appInstance = (SpringCloudAppInstance) Azure.az().getById(resourceId);
+            if (this.config instanceof RemoteConfiguration && Objects.nonNull(appInstance)) {
                 this.forwarder = new SpringPortForwarder(appInstance);
                 AzureTaskManager.getInstance().runOnPooledThread(() ->  this.forwarder.startForward(localPort));
                 return true;
@@ -106,8 +108,6 @@ public class PortForwardingTaskProvider extends BeforeRunTaskProvider<PortForwar
         @Override
         public void loadState(@Nonnull PortForwarderBeforeRunTaskState state) {
             XmlSerializerUtil.copyBean(state, this.state);
-            final String resourceId = this.state.properties.get(PortForwarderBeforeRunTaskState.RESOURCE_ID);
-            this.appInstance = (SpringCloudAppInstance) Azure.az().getById(resourceId);
         }
     }
 

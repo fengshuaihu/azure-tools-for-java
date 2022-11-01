@@ -17,7 +17,7 @@ import com.microsoft.azure.toolkit.lib.common.messager.AzureMessager;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTask;
 import com.microsoft.azure.toolkit.lib.common.task.AzureTaskManager;
 import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocument;
-import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocumentModule;
+import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocumentContainer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class UploadCosmosDocumentAction {
-    public static void importDocument(@Nonnull ICosmosDocumentModule container, @Nonnull Project project) {
+    public static void importDocument(@Nonnull ICosmosDocumentContainer<?> container, @Nonnull Project project) {
         final FileChooserDescriptor json = FileChooserDescriptorFactory.createSingleFileDescriptor("json");
         json.setTitle("Select the document to import");
         final VirtualFile[] virtualFiles = AzureTaskManager.getInstance().runLaterAsObservable(new AzureTask<>(() -> {

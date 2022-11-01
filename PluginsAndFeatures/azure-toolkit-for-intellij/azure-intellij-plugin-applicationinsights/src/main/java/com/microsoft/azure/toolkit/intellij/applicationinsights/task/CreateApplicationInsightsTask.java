@@ -34,7 +34,7 @@ public class CreateApplicationInsightsTask implements Task {
     }
 
     @Override
-    @AzureOperation(name = "guidance.create_application_insights", type = AzureOperation.Type.SERVICE)
+    @AzureOperation(name = "guidance.create_ai", type = AzureOperation.Type.SERVICE)
     public void execute() throws Exception {
         final String name = (String) Objects.requireNonNull(context.getParameter(APPLICATION_INSIGHTS_NAME),
                 "`name` is required to create application insights");

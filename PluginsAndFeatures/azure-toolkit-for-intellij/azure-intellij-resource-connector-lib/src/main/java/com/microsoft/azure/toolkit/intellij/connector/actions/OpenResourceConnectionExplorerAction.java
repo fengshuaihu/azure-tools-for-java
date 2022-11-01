@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class OpenResourceConnectionExplorerAction extends AzureAnAction {
     @Override
-    @AzureOperation(name = "common.open_resource_connection_explorer", type = AzureOperation.Type.ACTION)
+    @AzureOperation(name = "connector.open_resource_connection_explorer", type = AzureOperation.Type.ACTION)
     public boolean onActionPerformed(@NotNull AnActionEvent anActionEvent, @Nullable Operation operation) {
         // open azure resource connection explorer
         final Project project = anActionEvent.getProject();

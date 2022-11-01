@@ -32,19 +32,6 @@
           <text value="Partition Key:"/>
         </properties>
       </component>
-      <component id="1d02f" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
-            <minimum-size width="125" height="24"/>
-            <preferred-size width="125" height="24"/>
-            <maximum-size width="125" height="24"/>
-          </grid>
-        </constraints>
-        <properties>
-          <text value="Dedicated Throughput:"/>
-          <toolTipText value="You can optionally provision dedicated throughput for a container within a database that has throughput provisioned. This dedicated throughput amount will not be shared with other containers in the database and does not count towards the throughput you provisioned for the database. This throughput amount will be billed in addition to the throughput amount you provisioned at the database level."/>
-        </properties>
-      </component>
       <component id="d41c0" class="com.microsoft.azure.toolkit.intellij.common.AzureTextInput" binding="txtContainerId">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -59,10 +46,10 @@
       </component>
       <component id="483ad" class="javax.swing.JCheckBox" binding="chkDedicatedThroughput">
         <constraints>
-          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value=""/>
+          <text value="Provision dedicated throughput for this container"/>
         </properties>
       </component>
       <nested-form id="c1b2d" form-file="com/microsoft/azure/toolkit/intellij/cosmos/creation/ThroughputConfigPanel.form" binding="pnlThroughput">

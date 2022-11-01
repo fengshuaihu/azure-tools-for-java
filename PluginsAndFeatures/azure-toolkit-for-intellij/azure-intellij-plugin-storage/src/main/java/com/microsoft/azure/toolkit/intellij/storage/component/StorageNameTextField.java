@@ -46,7 +46,9 @@ public class StorageNameTextField extends AzureTextInput {
 
     public AzureValidationInfo doValidateTableValue() {
         final String value = StringUtils.trim(this.getValue());
-        if (!TABLE_NAME_PATTERN.matcher(value).matches()) {
+        if (StringUtils.equalsIgnoreCase(value, "tables")) {
+            return AzureValidationInfo.error("Table name can not be \"tables\"", this);
+        } else if (!TABLE_NAME_PATTERN.matcher(value).matches()) {
             return AzureValidationInfo.error("Table name can only contain lowercase letters and digits and must be between 3 and 36 characters", this);
         } else if (Character.isDigit(value.charAt(0))) {
             return AzureValidationInfo.error("Table name cannot begin with a digit", this);

@@ -18,6 +18,7 @@ import com.microsoft.azure.toolkit.lib.common.model.AzResource;
 import com.microsoft.azure.toolkit.lib.common.model.AzResourceBase;
 import com.microsoft.azure.toolkit.lib.cosmos.CosmosDBAccount;
 import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocument;
+import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocumentContainer;
 import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocumentModule;
 import com.microsoft.azure.toolkit.lib.resource.ResourceGroup;
 
@@ -47,8 +48,9 @@ public class CosmosActionsContributor implements IActionsContributor {
     public static final Action.Id<CosmosDBAccount> OPEN_DATABASE_TOOL = Action.Id.of("cosmos.open_database_tools");
     public static final Action.Id<CosmosDBAccount> OPEN_DATA_EXPLORER = Action.Id.of("cosmos.open_data_explorer.account");
     public static final Action.Id<CosmosDBAccount> COPY_CONNECTION_STRING = Action.Id.of("cosmos.copy_connection_string.account");
-    public static final Action.Id<ICosmosDocumentModule<?>> IMPORT_DOCUMENT = Action.Id.of("cosmos.import_document.container");
+    public static final Action.Id<ICosmosDocumentContainer<?>> IMPORT_DOCUMENT = Action.Id.of("cosmos.import_document.container");
     public static final Action.Id<ICosmosDocument> OPEN_DOCUMENT = Action.Id.of("cosmos.open_document.document");
+    public static final Action.Id<ICosmosDocumentContainer<?>> LOAD_MODE_DOCUMENT = Action.Id.of("cosmos.load_document");
     public static final Action.Id<ResourceGroup> GROUP_CREATE_COSMOS_SERVICE = Action.Id.of("group.create_cosmos_db_account");
 
     @Override
@@ -88,14 +90,19 @@ public class CosmosActionsContributor implements IActionsContributor {
         final ActionView.Builder openDocumentView = new ActionView.Builder("Open Document")
                 .title(s -> Optional.ofNullable(s).map(r ->
                         description("cosmos.open_document.document", ((ICosmosDocument) r).getName())).orElse(null))
-                .enabled(s -> s instanceof ICosmosDocument);
+                .enabled(s -> s instanceof ICosmosDocument && ((ICosmosDocument) s).getFormalStatus().isConnected());
         am.registerAction(OPEN_DOCUMENT, new Action<>(OPEN_DOCUMENT, openDocumentView));
 
         final ActionView.Builder importDocumentView = new ActionView.Builder("Import Document")
                 .title(s -> Optional.ofNullable(s).map(r ->
-                        description("cosmos.import_document.container", ((ICosmosDocumentModule) r).getName())).orElse(null))
-                .enabled(s -> s instanceof ICosmosDocumentModule<?>);
+                        description("cosmos.import_document.container", ((ICosmosDocumentContainer) r).getName())).orElse(null))
+                .enabled(s -> s instanceof ICosmosDocumentContainer<?> && ((ICosmosDocumentContainer<?>) s).getFormalStatus().isConnected());
         am.registerAction(IMPORT_DOCUMENT, new Action<>(IMPORT_DOCUMENT, importDocumentView));
+
+        final ActionView.Builder loadMoreDocumentView = new ActionView.Builder("Load More Document")
+                .title(s -> Optional.ofNullable(s).map(r -> description("cosmos.load_document")).orElse(null))
+                .enabled(s -> s instanceof ICosmosDocumentContainer && ((ICosmosDocumentContainer<?>) s).getFormalStatus().isConnected());
+        am.registerAction(LOAD_MODE_DOCUMENT, new Action<>(LOAD_MODE_DOCUMENT, container -> container.getDocumentModule().loadMoreDocuments(), loadMoreDocumentView));
     }
 
     @Override

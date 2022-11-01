@@ -36,7 +36,7 @@ import com.microsoft.azure.toolkit.lib.cosmos.AzureCosmosService;
 import com.microsoft.azure.toolkit.lib.cosmos.CosmosDBAccount;
 import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDatabaseDraft;
 import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocument;
-import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocumentModule;
+import com.microsoft.azure.toolkit.lib.cosmos.ICosmosDocumentContainer;
 import com.microsoft.azure.toolkit.lib.cosmos.cassandra.CassandraCosmosDBAccount;
 import com.microsoft.azure.toolkit.lib.cosmos.cassandra.CassandraKeyspace;
 import com.microsoft.azure.toolkit.lib.cosmos.cassandra.CassandraTableDraft;
@@ -70,8 +70,8 @@ public class IntelliJCosmosActionsContributor implements IActionsContributor {
         final BiConsumer<ICosmosDocument, AnActionEvent> documentHandler = (c, e) -> OpenCosmosDocumentAction.open(c, e.getProject());
         am.registerHandler(CosmosActionsContributor.OPEN_DOCUMENT, documentCondition, documentHandler);
 
-        final BiPredicate<ICosmosDocumentModule<?>, AnActionEvent> importCondition = (r, e) -> r instanceof ICosmosDocumentModule;
-        final BiConsumer<ICosmosDocumentModule<?>, AnActionEvent> importHandler = (c, e) -> UploadCosmosDocumentAction.importDocument(c, e.getProject());
+        final BiPredicate<ICosmosDocumentContainer<?>, AnActionEvent> importCondition = (r, e) -> r instanceof ICosmosDocumentContainer;
+        final BiConsumer<ICosmosDocumentContainer<?>, AnActionEvent> importHandler = (c, e) -> UploadCosmosDocumentAction.importDocument(c, e.getProject());
         am.registerHandler(CosmosActionsContributor.IMPORT_DOCUMENT, importCondition, importHandler);
 
         final BiConsumer<ResourceGroup, AnActionEvent> groupCreateHandler = (r, e) ->

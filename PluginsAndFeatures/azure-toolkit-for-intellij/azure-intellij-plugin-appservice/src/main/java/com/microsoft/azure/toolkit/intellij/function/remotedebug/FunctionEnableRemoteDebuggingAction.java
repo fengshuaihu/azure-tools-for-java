@@ -75,6 +75,6 @@ public class FunctionEnableRemoteDebuggingAction {
 
     private static Action<?> generateDebugAction(@Nonnull FunctionAppBase<?, ?, ?> app, @Nullable Project project) {
         final Action<FunctionAppBase<?, ?, ?>> remoteDebuggingAction = AzureActionManager.getInstance().getAction(FunctionAppActionsContributor.REMOTE_DEBUGGING);
-        return new Action<>(Action.Id.of("function.remote_debugging.app"), (d, e) -> remoteDebuggingAction.handle(app, e), new ActionView.Builder("Attach Debugger"));
+        return new Action<>(Action.Id.of("function.start_remote_debugging.app"), (d, e) -> remoteDebuggingAction.handle(app, e), new ActionView.Builder("Attach Debugger"));
     }
 }
