@@ -11,6 +11,8 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.microsoft.azure.hdinsight.common.StreamUtil;
+import com.microsoft.azure.hdinsight.projects.util.FileListener;
+import com.microsoft.azure.hdinsight.projects.util.FileMonitor;
 import com.microsoft.azure.hdinsight.projects.util.ProjectSampleUtil;
 import com.microsoft.azuretools.azurecommons.helpers.NotNull;
 import com.microsoft.tooling.msservices.components.DefaultLoader;
@@ -81,11 +83,20 @@ public class MavenProjectGenerator {
                 break;
             case Scala:
             case ScalaClusterSample:
+                removeImlFile(root);
                 VfsUtil.createDirectories(root + "/src/main/scala/sample");
                 VfsUtil.createDirectories(root + "/src/main/resources");
                 VfsUtil.createDirectories(root + "/src/test/scala");
                 break;
         }
+    }
+
+    private void removeImlFile(String root) {
+        FileMonitor fileMonitor = new FileMonitor(100);
+        FileListener fileListener = new FileListener(new File(root + File.separator + this.module.getName() + ".iml"));
+        fileListener.setMonitor(fileMonitor);
+        fileMonitor.monitor(root + File.separator ,fileListener);
+        fileMonitor.start();
     }
 
     private void createPom(String root) throws Exception {
