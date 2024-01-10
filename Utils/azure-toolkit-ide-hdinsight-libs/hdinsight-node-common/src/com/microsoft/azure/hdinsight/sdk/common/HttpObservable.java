@@ -255,7 +255,7 @@ public class HttpObservable implements ILogger {
 
                 sslSocketFactory = new SSLConnectionSocketFactory(
                         sslContext,
-                        new String[] { "TLSv1.2", "TLSv1.3" },
+                        new String[] { "TLSv1.3" },
                         null,
                         HttpObservable.isSSLCertificateValidationDisabled()
                                 ? NoopHostnameVerifier.INSTANCE
